@@ -3,6 +3,62 @@ import { Settings, Trophy, ChartLine, BookOpen, Bell } from "lucide-react";
 import PageContainer from "@/components/ui/page-container";
 import { Button } from "@/components/ui/button";
 
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  trend: string;
+}
+
+interface AchievementProps {
+  icon: React.ReactNode;
+  title: string;
+  date: string;
+  xp: string;
+}
+
+interface ActivityItemProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  time: string;
+}
+
+const StatCard = ({ icon, label, value, trend }: StatCardProps) => (
+  <div className="bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm">
+    <div className="flex items-center gap-2 text-primary mb-2">
+      {icon}
+      <span className="font-medium">{label}</span>
+    </div>
+    <div className="text-2xl font-bold text-gray-900">{value}</div>
+    <div className="text-sm text-gray-500">{trend}</div>
+  </div>
+);
+
+const Achievement = ({ icon, title, date, xp }: AchievementProps) => (
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-3">
+      <div className="p-2 bg-primary/10 rounded-lg text-primary">{icon}</div>
+      <div>
+        <div className="font-medium text-gray-900">{title}</div>
+        <div className="text-sm text-gray-500">{date}</div>
+      </div>
+    </div>
+    <div className="text-sm font-medium text-primary">+{xp} XP</div>
+  </div>
+);
+
+const ActivityItem = ({ icon, title, description, time }: ActivityItemProps) => (
+  <div className="flex items-center gap-3">
+    <div className="p-2 bg-primary/10 rounded-lg text-primary">{icon}</div>
+    <div>
+      <div className="font-medium text-gray-900">{title}</div>
+      <div className="text-sm text-gray-500">{description}</div>
+      <div className="text-xs text-gray-400">{time}</div>
+    </div>
+  </div>
+);
+
 const Profile = () => {
   return (
     <PageContainer className="space-y-6">
@@ -76,15 +132,15 @@ const Profile = () => {
             time="2 hours ago"
           />
           <ActivityItem
-            icon={<ChartLine className="w-5 h-
+            icon={<ChartLine className="w-5 h-5" />}
+            title="Investment Made"
+            description="Invested in ETF fund"
+            time="5 hours ago"
+          />
+        </div>
+      </div>
+    </PageContainer>
+  );
+};
 
-If there's knowledge, context or custom instructions you want to include in every edit in this project, set it below.
-
-<lov-actions>
-<lov-knowledge>
-</lov-actions>
-
-This project will require robust backend functionality for managing user accounts, tracking investments, handling real-time market data, and facilitating social features.  You can use the Supabase menu on the top right to connect your project to Supabase.
-<lov-actions>
-<lov-message-prompt message="Tell me more about Supabase">Learn more about Supabase</lov-message-prompt>
-</lov-actions>
+export default Profile;
