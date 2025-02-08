@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const NavigationBar = () => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 py-2 px-4 md:top-0 md:bottom-auto z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 py-2 px-4 z-50">
       <nav className="max-w-screen-xl mx-auto">
         <ul className="flex justify-around items-center">
           <NavItem icon={<Home className="w-6 h-6" />} label="Home" to="/" />
@@ -31,3 +31,4 @@ const NavItem = ({ icon, label, to }: { icon: React.ReactNode; label: string; to
 );
 
 export default NavigationBar;
+
