@@ -1,6 +1,7 @@
 
 import { BookOpen, Check, Lock } from "lucide-react";
 import PageContainer from "@/components/ui/page-container";
+import { TradingSimulator } from "@/components/ui/trading-simulator";
 
 const Learn = () => {
   return (
@@ -9,6 +10,8 @@ const Learn = () => {
         <h1 className="text-4xl font-bold text-gray-900">Learning Path</h1>
         <p className="text-gray-600">Master the art of investing through fun lessons</p>
       </div>
+
+      <TradingSimulator />
 
       <div className="space-y-4">
         {/* Module 1 */}
