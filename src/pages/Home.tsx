@@ -1,15 +1,26 @@
-
-import { Trophy, TrendingUp, BookOpen } from "lucide-react";
+import { Trophy, TrendingUp, BookOpen, Award, Sparkles } from "lucide-react";
 import PageContainer from "@/components/ui/page-container";
+import { NextLessonCard } from "@/components/home/next-lesson-card";
+import { MiniChart } from "@/components/ui/mini-chart";
 
 const Home = () => {
+  // Sample data for the mini chart
+  const chartData = Array.from({ length: 7 }, (_, i) => ({
+    date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toISOString(),
+    value: 1000 + Math.random() * 500,
+  }));
+
   return (
     <PageContainer className="space-y-6">
       {/* Welcome Section */}
       <div className="text-center space-y-2">
+        <div className="text-sm text-primary font-medium">Day 5 Streak! 🔥</div>
         <h1 className="text-4xl font-bold text-gray-900">Welcome back, Investor!</h1>
         <p className="text-gray-600">Ready to continue your investment journey?</p>
       </div>
+
+      {/* Next Lesson Card */}
+      <NextLessonCard />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4">
@@ -17,11 +28,33 @@ const Home = () => {
           <div className="text-primary font-semibold">Portfolio Value</div>
           <div className="text-2xl font-bold">$1,234.56</div>
           <div className="text-success text-sm">+2.4% today</div>
+          <MiniChart data={chartData} className="text-success mt-2" />
         </div>
         <div className="bg-white/80 backdrop-blur p-4 rounded-xl border border-gray-200 shadow-sm">
           <div className="text-primary font-semibold">XP Points</div>
           <div className="text-2xl font-bold">2,450</div>
-          <div className="text-sm text-gray-600">Level 5</div>
+          <div className="text-sm text-gray-600">20 XP to Level 6!</div>
+          <div className="mt-2 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-yellow-500" />
+            <span className="text-sm text-muted-foreground">
+              Top 10% this week
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Tip */}
+      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+        <div className="flex gap-3 items-center">
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+            <Award className="w-4 h-4 text-blue-700" />
+          </div>
+          <div className="flex-1">
+            <div className="text-sm font-medium text-blue-900">Tip of the Day</div>
+            <div className="text-sm text-blue-700">
+              Diversifying your portfolio helps manage risk effectively.
+            </div>
+          </div>
         </div>
       </div>
 

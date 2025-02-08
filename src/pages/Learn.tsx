@@ -1,87 +1,161 @@
-
-import { BookOpen, Check, Lock } from "lucide-react";
+import * as React from "react";
+import { Trophy, Sparkles, Users } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import PageContainer from "@/components/ui/page-container";
 import { TradingSimulator } from "@/components/ui/trading-simulator";
+import { LessonCard } from "@/components/ui/lesson-card";
+import { Quiz } from "@/components/ui/quiz";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useAchievements } from "@/contexts/useAchievements";
+import { SimulationProvider } from "@/contexts/simulation-context";
+
+// Define the type for a module
+interface Module {
+  id: number;
+  title: string;
+  description: string;
+  progress: number;
+  status: "completed" | "locked";
+  lessons: Lesson[];
+}
+
+interface Lesson {
+  id: number;
+  title: string;
+  description: string;
+  completed: boolean;
+  xp: number;
+  quiz?: QuizProps;
+}
+
+// Mock data - in a real app this would come from an API
+const modules: Module[] = [
+  {
+    id: 1,
+    title: "Investing Basics",
+    description: "Foundation of successful investing",
+    progress: 100,
+    status: "completed",
+    lessons: [
+      {
+        id: 1,
+        title: "Lesson 1",
+        description: "Introduction to investing",
+        completed: true,
+        xp: 50,
+      },
+      // Add more lessons...
+    ],
+  },
+  // Add more modules...
+];
 
 const Learn = () => {
+  const [userXp, setUserXp] = React.useState(150);
+  const { checkAchievement } = useAchievements();
+  const [completedLessons, setCompletedLessons] = React.useState<number[]>([]);
+  const totalProgress = Math.round(
+    (modules.reduce((acc, m) => acc + m.progress, 0) / (modules.length * 100)) * 100
+  );
+
+  const handleLessonComplete = (lessonId: number, xpGained: number) => {
+    setCompletedLessons((prev) => [...prev, lessonId]);
+    setUserXp((prev) => prev + xpGained);
+    checkAchievement("lesson_complete", completedLessons.length + 1);
+  };
+
+  const canAccessModule = (moduleIndex: number) => {
+    if (moduleIndex === 0) return true;
+    const prevModule = modules[moduleIndex - 1];
+    return prevModule.progress === 100;
+  };
+
   return (
-    <PageContainer className="space-y-6">
-      <div className="text-center space-y-2">
+    <PageContainer className="space-y-8">
+      <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-gray-900">Learning Path</h1>
         <p className="text-gray-600">Master the art of investing through fun lessons</p>
+
+        <div className="max-w-xl mx-auto bg-white/50 backdrop-blur border rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-primary" />
+              <span className="font-medium">{userXp} XP</span>
+            </div>
+            <span className="text-sm text-muted-foreground">{totalProgress}% Complete</span>
+          </div>
+          <Progress value={totalProgress} />
+        </div>
       </div>
 
-      <TradingSimulator />
+      <SimulationProvider>
+        <TradingSimulator />
+      </SimulationProvider>
 
-      <div className="space-y-4">
-        {/* Module 1 */}
-        <div className="bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold">Investing Basics</h2>
-              <p className="text-gray-600">Foundation of successful investing</p>
-            </div>
-            <div className="px-3 py-1 bg-success/10 text-success rounded-full text-sm">
-              Completed
-            </div>
-          </div>
-          <div className="space-y-3">
-            <LessonItem title="What is Investing?" completed={true} xp="50" />
-            <LessonItem title="Types of Investments" completed={true} xp="50" />
-            <LessonItem title="Risk and Return" completed={true} xp="50" />
-          </div>
-        </div>
+      <div className="grid gap-6">
+        <AnimatePresence mode="popLayout">
+          {modules.map((module, index) => {
+            const isAccessible = canAccessModule(index);
 
-        {/* Module 2 */}
-        <div className="bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold">Stock Market Basics</h2>
-              <p className="text-gray-600">Understanding how stocks work</p>
-            </div>
-            <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-              In Progress
-            </div>
-          </div>
-          <div className="space-y-3">
-            <LessonItem title="What are Stocks?" completed={true} xp="50" />
-            <LessonItem title="How to Buy Stocks" completed={false} xp="50" />
-            <LessonItem title="Market Analysis" locked={true} xp="50" />
-          </div>
-        </div>
+            return (
+              <motion.div
+                key={module.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ delay: index * 0.1 }}
+                className={cn(!isAccessible && "opacity-50")}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl font-semibold">{module.title}</h2>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">32 peers learning</span>
+                  </div>
+                </div>
 
-        {/* Module 3 */}
-        <div className="bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm opacity-75">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold">Advanced Strategies</h2>
-              <p className="text-gray-600">Take your investing to the next level</p>
-            </div>
-            <div className="px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-sm">
-              Locked
-            </div>
-          </div>
-          <div className="space-y-3">
-            <LessonItem title="Portfolio Diversification" locked={true} xp="100" />
-            <LessonItem title="Technical Analysis" locked={true} xp="100" />
-            <LessonItem title="Investment Strategies" locked={true} xp="100" />
-          </div>
-        </div>
+                <div className="grid gap-4">
+                  {module.lessons.map((lesson) => (
+                    <LessonCard
+                      key={lesson.id}
+                      title={lesson.title}
+                      description={lesson.description}
+                      completed={lesson.completed}
+                      locked={!isAccessible}
+                      xp={lesson.xp}
+                      progress={lesson.completed ? 100 : 0}
+                      badge={lesson.completed ? "Completed" : module.status === "locked" ? "Locked" : ""}
+                      onClick={() => {
+                        if (!lesson.completed && isAccessible) {
+                          handleLessonComplete(lesson.id, lesson.xp);
+                        }
+                      }}
+                    >
+                      {lesson.quiz && !lesson.completed && isAccessible && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <Quiz
+                            {...lesson.quiz}
+                            onComplete={(correct) => {
+                              if (correct) {
+                                handleLessonComplete(lesson.id, lesson.xp);
+                                checkAchievement("quiz_complete", 1);
+                              }
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </LessonCard>
+                  ))}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
     </PageContainer>
   );
 };
-
-const LessonItem = ({ title, completed, locked, xp }: { title: string; completed?: boolean; locked?: boolean; xp: string }) => (
-  <div className={`flex items-center gap-4 p-3 rounded-lg ${locked ? 'opacity-50' : 'hover:bg-gray-50'}`}>
-    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completed ? 'bg-success/10 text-success' : locked ? 'bg-gray-200 text-gray-400' : 'bg-primary/10 text-primary'}`}>
-      {completed ? <Check className="w-4 h-4" /> : locked ? <Lock className="w-4 h-4" /> : <BookOpen className="w-4 h-4" />}
-    </div>
-    <div className="flex-1">
-      <span className="font-medium">{title}</span>
-    </div>
-    <span className="text-sm text-gray-600">{xp} XP</span>
-  </div>
-);
 
 export default Learn;
