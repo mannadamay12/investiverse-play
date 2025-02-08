@@ -46,7 +46,7 @@ export const TradingSimulator = () => {
   };
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 md:relative md:bottom-auto bg-white/80 backdrop-blur p-4 md:p-6 border-t md:border md:rounded-xl border-gray-200 shadow-sm z-40">
+    <div className="fixed bottom-16 md:bottom-0 left-0 right-0 bg-white/80 backdrop-blur p-4 md:p-6 border-t border-gray-200 shadow-sm z-40">
       <div className="flex justify-between items-center mb-4 md:mb-6">
         <div>
           <h3 className="text-lg md:text-xl font-semibold">Trading Simulator</h3>
