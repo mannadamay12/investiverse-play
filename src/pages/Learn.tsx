@@ -8,6 +8,7 @@ import { SimulationProvider } from "@/contexts/simulation-context";
 import { TradingSimulator } from "@/components/ui/trading-simulator";
 import { LessonModal } from "@/components/ui/lesson-modal";
 import { Category, Lesson, LessonContent } from "@/types/lesson";
+import { PageChat } from "@/components/shared/PageChat";
 
 interface ModuleCardProps {
   title: string;
@@ -144,6 +145,7 @@ const Learn = () => {
           />
         ))}
       </div>
+      <PageChat />
     </PageContainer>
   );
 };

@@ -15,6 +15,7 @@ import { processStockData, getAvailableSymbols, getStockDataForSymbol, getEnhanc
 import { EnhancedStockData, StockData, StockDataPoint } from '@/types/stock';
 import stockData from '@/assets/dow30_daily_close.json';
 import { InvestModal } from "@/components/invest/InvestModal";
+import { PageChat } from "@/components/shared/PageChat";
 
 interface stockData {
   name: string;
@@ -256,6 +257,7 @@ const Invest = () => {
           </div>
         </div>
       </div>
+      <PageChat />
     </PageContainer>
   );
 };

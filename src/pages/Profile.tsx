@@ -6,6 +6,7 @@ import { BadgeGallery } from "@/components/profile/badge-gallery";
 import { ActivityFeed } from "@/components/profile/activity-feed";
 import { type UserProfile } from "@/types/profile";
 import defaultAvatar from "@/assets/default.png";
+import { PageChat } from "@/components/shared/PageChat";
 
 const mockProfile: UserProfile = {
   id: "1",
@@ -136,19 +137,22 @@ const Profile = () => {
   };
 
   return (
-    <PageContainer className="space-y-6">
-      <ProfileHeader
-        profile={profile}
-        onEditProfile={handleEditProfile}
-        onAvatarChange={handleAvatarChange}
-      />
-      <StatsOverview profile={profile} />
-      <div className="bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Badges</h2>
-        <BadgeGallery badges={profile.badges} />
-      </div>
-      <ActivityFeed achievements={profile.achievements} />
-    </PageContainer>
+    <>
+      <PageContainer className="space-y-6">
+        <ProfileHeader
+          profile={profile}
+          onEditProfile={handleEditProfile}
+          onAvatarChange={handleAvatarChange}
+        />
+        <StatsOverview profile={profile} />
+        <div className="bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">Badges</h2>
+          <BadgeGallery badges={profile.badges} />
+        </div>
+        <ActivityFeed achievements={profile.achievements} />
+      </PageContainer>
+      <PageChat />
+    </>
   );
 };
 
