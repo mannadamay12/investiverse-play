@@ -14,6 +14,7 @@ import {
   ChatBubbleAvatar,
 } from "@/components/ui/chat-bubble";
 import DOMPurify from "dompurify";
+import { useUser } from "@/contexts/UserContext";
 
 interface Message {
   content: string;
@@ -21,12 +22,20 @@ interface Message {
 }
 
 export function PageChat() {
+  const { userId } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
     if (!inputMessage.trim()) return;
-
+    if (!userId) {
+      setMessages((prev) => [
+        ...prev,
+        { content: "⚠️ Error: No user ID found. Please log in.", type: "received" },
+      ]);
+      return;
+    }
     setMessages((prev) => [...prev, { content: inputMessage, type: "sent" }]);
     setInputMessage("");
 
