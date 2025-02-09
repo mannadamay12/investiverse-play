@@ -1,5 +1,5 @@
+
 import image from "../assets/landing.jpg";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Landing = () => {
@@ -19,25 +19,41 @@ const Landing = () => {
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl">
             Learn, invest, and compete in a risk-free environment
           </p>
-          <div className="space-x-4">
-            <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90"
-              asChild
+          <div className="space-x-6">
+            {/* Pixel art style buttons */}
+            <Link 
+              to="/signup" 
+              className="relative inline-block w-[140px] h-[50px] group"
             >
-              <Link to="/signup">Get Started</Link>
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="bg-white/10 hover:bg-white/20 text-white border-white"
-              asChild
+              <div className="absolute inset-0 bg-[#e6d9bf] clip-button" />
+              <div className="absolute inset-[10%] bg-[#ef623c]" />
+              <span className="absolute inset-0 flex items-center justify-center font-bold text-white uppercase tracking-wider font-mono">
+                Sign Up
+              </span>
+            </Link>
+            <Link 
+              to="/login" 
+              className="relative inline-block w-[140px] h-[50px] group"
             >
-              <Link to="/login">Login</Link>
-            </Button>
+              <div className="absolute inset-0 bg-[#e6d9bf] clip-button" />
+              <div className="absolute inset-[10%] bg-[#ef623c]" />
+              <span className="absolute inset-0 flex items-center justify-center font-bold text-white uppercase tracking-wider font-mono">
+                Login
+              </span>
+            </Link>
           </div>
         </div>
       </main>
+      <style>
+        {`
+          .clip-button {
+            clip-path: polygon(
+              0 10%, 5% 10%, 5% 0, 95% 0, 95% 10%, 100% 10%,
+              100% 90%, 95% 90%, 95% 100%, 5% 100%, 5% 90%, 0 90%
+            );
+          }
+        `}
+      </style>
     </div>
   );
 };
