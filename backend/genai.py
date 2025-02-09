@@ -6,10 +6,10 @@ import json
 from supabase import create_client, Client
 
 SUPABASE_URL = "https://tfmbjbskzindivtnxtrf.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmbWJqYnNremluZGl2dG54dHJmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTA0NzgyOCwiZXhwIjoyMDU0NjIzODI4fQ.kmTKVQj8HomFUP5stjGlsPPHNGlcZMuNNB6mvvq5JbA"
+SUPABASE_KEY = "<>"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-groq_client = Groq(api_key="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")
+groq_client = Groq(api_key="<>")
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 predefined_intents = [
