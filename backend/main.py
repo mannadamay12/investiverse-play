@@ -1,6 +1,8 @@
 import os
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 from supabase import create_client, Client
 
 SUPABASE_URL = "https://tfmbjbskzindivtnxtrf.supabase.co"
@@ -8,6 +10,15 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (Change this for security in production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, PUT, DELETE)
+    allow_headers=["*"],  # Allows all headers
+)
+
 class UserSignup(BaseModel):
     email: str
     password: str
@@ -47,6 +58,7 @@ def signup(user: UserSignup):
     
     # Retrieve the user data directly from the auth response.
     user_data = auth_response_dict.get("user")
+    session_data = auth_response_dict.get("session")
     if not user_data:
         raise HTTPException(status_code=400, detail="No user data returned")
     
@@ -65,9 +77,12 @@ def signup(user: UserSignup):
             status_code=400,
             detail="Error inserting user into database"
         )
-    
+    access_token = None
+    if session_data:
+        access_token = session_data.get("access_token")
+
     print(f"User signed up successfully! user_id: {user_id}")
-    return {"message": "User signed up successfully!", "user_id": user_id}
+    return {"message": "User signed up successfully!", "user_id": user_id, "email": user.email, "access_token": access_token}
 
 @app.post("/login")
 def login(user: UserSignup):
@@ -83,13 +98,17 @@ def login(user: UserSignup):
     
     # Retrieve the user data directly from the auth response.
     user_data = auth_response_dict.get("user")
+    session_data = auth_response_dict.get("session")
     user_id = user_data.get("id")
     if not user_data:
         raise HTTPException(status_code=400, detail="No user data returned")
     
     user_id = user_data.get("id")
+    access_token = None
+    if session_data:
+        access_token = session_data.get("access_token")
     print(f"Login success: {user_id}")
-    return {"message": "Login successful!", "user_id": user_id}
+    return {"message": "Login successful!", "user_id": user_id, "email": user.email, "access_token": access_token}
 
 @app.post("/trades/add")
 def record_trade(trade: Trade):
@@ -179,6 +198,26 @@ def update_portfolio(trade: Trade):
 
     return {"message": "Portfolio updated successfully!"}
 
-# test_user = UserSignup(email="adamay@gmail.com", password="SecurePass123!")
+@app.get("/portfolio/{user_id}")
+def get_portfolio(user_id: str):
+    # Fetch portfolio data for the given user_id
+    response = supabase.from_("portfolio").select("*").eq("user_id", user_id).single().execute()
+
+    # Check for errors or missing data
+    if response.data is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found for this user")
+    print(response.data)
+    return response.data  # Return the fetched portfolio data
+
+@app.get("/")
+def read_root():
+    return {"message": "FastAPI is running on Railway!"}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+
+# test_user = UserSignup(email="anitej5@gmail.com", password="SecurePass123!")
 # test_trade = Trade(user_id="73261abe-21e4-4969-9bc1-e270fb1feabb", stock_name="AAPL", trade_type="BUY", quantity=5, price=50.0)
 # record_trade(test_trade)
+# signup(test_user)
+# get_portfolio(user_id="73261abe-21e4-4969-9bc1-e270fb1feabb")
