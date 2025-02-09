@@ -1,30 +1,33 @@
-
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2D2654] via-[#8B2E68] to-[#2D2654] text-white overflow-hidden">
+    <div className="min-h-screen overflow-hidden" 
+      style={{
+        backgroundImage: 'url("/lovable-uploads/a93c76ac-c0eb-4a10-9180-ff901c9e4260.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
       {/* Navigation */}
-      <nav className="hidden md:flex justify-between items-center p-6">
+      <nav className="flex justify-between items-center p-6 bg-black/20 backdrop-blur-sm">
         <div className="flex items-center space-x-2">
-          <div className="w-10 h-10 bg-white rounded-lg"></div>
-          <span className="text-xl font-bold">Loading loogo</span>
+          <span className="text-xl font-bold text-orange-400">INVESTIVERSE</span>
         </div>
-        <div className="flex items-center space-x-8">
-          <a href="#" className="hover:text-yellow-300 transition-colors">GAMIFIED</a>
-          <a href="#" className="hover:text-yellow-300 transition-colors">ABOUT US</a>
-          <a href="#" className="hover:text-yellow-300 transition-colors">STROUT TES</a>
-          <a href="#" className="hover:text-yellow-300 transition-colors">HoJo</a>
-          <a href="#" className="hover:text-yellow-300 transition-colors">TopGng</a>
+        <div className="hidden md:flex items-center space-x-8">
+          <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors px-4 py-2 border-b-2 border-orange-400">HOME</a>
+          <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors px-4 py-2">LEARN</a>
+          <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors px-4 py-2">INVEST</a>
+          <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors px-4 py-2">PROFILE</a>
+          <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors px-4 py-2">LEADERBOARD</a>
         </div>
       </nav>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 md:py-16 relative">
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          {/* Left Column */}
           <div className="space-y-6">
             <h1 className="text-5xl md:text-7xl font-bold leading-tight drop-shadow-lg">
               <span className="block text-yellow-300">LEVEL UP</span>
@@ -51,9 +54,7 @@ const Landing = () => {
             </p>
           </div>
 
-          {/* Right Column */}
           <div className="relative">
-            {/* Character Image */}
             <div className="relative z-10 flex justify-center">
               <div className="w-64 h-[500px] bg-purple-900 rounded-3xl relative flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -66,7 +67,6 @@ const Landing = () => {
               </div>
             </div>
 
-            {/* Floating Card */}
             <Card className="absolute top-10 right-0 p-6 bg-purple-900/90 backdrop-blur text-white rounded-xl max-w-xs">
               <h3 className="text-2xl font-bold text-yellow-300 mb-4">REWARDS</h3>
               <div className="space-y-4">
@@ -80,7 +80,6 @@ const Landing = () => {
               </div>
             </Card>
 
-            {/* Learning Section */}
             <div className="mt-8 space-y-2">
               <h3 className="text-2xl font-bold">Learning accets</h3>
               <p className="text-lg opacity-90">
@@ -90,7 +89,6 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl"></div>
       </main>
