@@ -1,13 +1,87 @@
+import * as React from "react"
+import { Trophy, Medal, Award, Flame, Info } from "lucide-react"
+import PageContainer from "@/components/ui/page-container"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { generateMockLeaderboardData, getLevelInfo } from "@/lib/leaderboard"
+import { type LeaderboardScope, type LeaderboardTimeframe } from "@/types/leaderboard"
+import { cn } from "@/lib/utils"
 
-import { Trophy, Medal, Award } from "lucide-react";
-import PageContainer from "@/components/ui/page-container";
+export default function Leaderboard() {
+  const [scope, setScope] = React.useState<LeaderboardScope>("global")
+  const [timeframe, setTimeframe] = React.useState<LeaderboardTimeframe>("allTime")
+  const [showTutorial, setShowTutorial] = React.useState(true)
 
-const Leaderboard = () => {
+  const leaderboardData = React.useMemo(
+    () => generateMockLeaderboardData(scope, timeframe),
+    [scope, timeframe]
+  )
+
+  const top3 = leaderboardData.slice(0, 3)
+  const rest = leaderboardData.slice(3, 10)
+
+  const userRank = {
+    position: 7,
+    xp: 4530,
+    nextMilestone: {
+      xpNeeded: 50,
+      playerName: "Player 6"
+    }
+  }
+
   return (
     <PageContainer className="space-y-6">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold text-gray-900">Leaderboard</h1>
         <p className="text-gray-600">See how you stack up against other investors</p>
+      </div>
+
+      <Tabs defaultValue={scope} onValueChange={(v) => setScope(v as LeaderboardScope)} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="global">Global</TabsTrigger>
+          <TabsTrigger value="friends">Friends</TabsTrigger>
+          <TabsTrigger value="local">Local</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <Tabs defaultValue={timeframe} onValueChange={(v) => setTimeframe(v as LeaderboardTimeframe)}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="daily">Daily</TabsTrigger>
+          <TabsTrigger value="weekly">Weekly</TabsTrigger>
+          <TabsTrigger value="allTime">All Time</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {/* Personal Rank Card */}
+      <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-6 flex items-center justify-between">
+        <div>
+          <h3 className="text-xl font-semibold">
+            You're #{userRank.position}!
+          </h3>
+          <p className="text-muted-foreground">
+            {userRank.nextMilestone ? (
+              <span>
+                {userRank.nextMilestone.xpNeeded} XP to surpass {userRank.nextMilestone.playerName}
+              </span>
+            ) : (
+              "Keep pushing to climb the ranks!"
+            )}
+          </p>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold">{userRank.xp.toLocaleString()} XP</div>
+          <div className={cn("text-sm font-medium", getLevelInfo(userRank.xp).color)}>
+            {getLevelInfo(userRank.xp).name}
+          </div>
+        </div>
       </div>
 
       {/* Top 3 Winners */}
@@ -52,32 +126,99 @@ const Leaderboard = () => {
       {/* Leaderboard List */}
       <div className="bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm">
         <div className="space-y-4">
-          {[4, 5, 6, 7, 8, 9, 10].map((position) => (
-            <LeaderboardItem
-              key={position}
-              position={position}
-              name={`Player ${position}`}
-              xp={5230 - position * 100}
-              image={`https://api.dicebear.com/7.x/avataaars/svg?seed=Player${position}`}
-            />
+          {rest.map((entry) => (
+            <LeaderboardItem key={entry.id} entry={entry} />
           ))}
         </div>
       </div>
+
+      {/* Tutorial Dialog */}
+      <Dialog open={showTutorial} onOpenChange={setShowTutorial}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Welcome to the Leaderboard! 🏆</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>Here's how to climb the ranks and earn recognition:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Complete lessons and quizzes to earn XP</li>
+              <li>Make smart investment decisions in simulations</li>
+              <li>Maintain daily streaks for bonus points</li>
+              <li>Earn badges for special achievements</li>
+            </ul>
+            <Button onClick={() => setShowTutorial(false)} className="w-full">
+              Got it!
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
+  )
+}
+
+function LeaderboardItem({ entry }: { entry: LeaderboardEntry }) {
+  return (
+    <div className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+      <div className="w-8 text-center font-semibold text-gray-600">
+        #{entry.position}
+      </div>
+
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Avatar className="w-10 h-10 cursor-pointer">
+            <AvatarImage src={entry.avatar} alt={entry.name} />
+            <AvatarFallback>{entry.name[0]}</AvatarFallback>
+          </Avatar>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-80">
+          <div className="flex justify-between space-x-4">
+            <Avatar>
+              <AvatarImage src={entry.avatar} />
+              <AvatarFallback>{entry.name[0]}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+              <h4 className="text-sm font-semibold">{entry.name}</h4>
+              <div className="flex gap-1">
+                {entry.badges.map(badge => (
+                  <span key={badge.id} title={badge.name}>{badge.icon}</span>
+                ))}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                XP Breakdown: {entry.xpBreakdown.quizzes}% Quizzes, 
+                {entry.xpBreakdown.investing}% Investing,
+                {entry.xpBreakdown.challenges}% Challenges
+              </div>
+            </div>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
+
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <span className="font-medium">{entry.name}</span>
+          {entry.streak > 0 && (
+            <div className="flex items-center gap-1 text-orange-500" title={`${entry.streak} day streak`}>
+              <Flame className="w-4 h-4" />
+              <span className="text-xs font-medium">{entry.streak}</span>
+            </div>
+          )}
+          {entry.recentAchievement && (
+            <Badge variant="secondary" className="ml-2">
+              {entry.recentAchievement}
+            </Badge>
+          )}
+        </div>
+        <div className="text-sm text-gray-600">
+          {entry.xp.toLocaleString()} XP
+          <span className={cn("ml-2 font-medium", entry.level.color)}>
+            {entry.level.name}
+          </span>
+        </div>
+      </div>
+
+      <Button variant="ghost" size="sm">
+        Challenge
+      </Button>
+    </div>
   );
-};
-
-const LeaderboardItem = ({ position, name, xp, image }: { position: number; name: string; xp: number; image: string }) => (
-  <div className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-    <div className="w-8 text-center font-semibold text-gray-600">#{position}</div>
-    <div className="w-10 h-10 rounded-full overflow-hidden">
-      <img src={image} alt={name} className="w-full h-full" />
-    </div>
-    <div className="flex-1">
-      <div className="font-medium">{name}</div>
-      <div className="text-sm text-gray-600">{xp.toLocaleString()} XP</div>
-    </div>
-  </div>
-);
-
-export default Leaderboard;
+}

@@ -99,3 +99,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+.tooltip {
+  position: absolute;
+  background-color: var(--background);
+  color: var(--foreground);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  z-index: 10;
+}
+
+.label {
+  position: relative;
+  display: inline-block;
+  background-color: var(--background);
+  color: var(--foreground);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -11,29 +11,32 @@ import Leaderboard from "./pages/Leaderboard";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { AchievementProvider } from "@/contexts/achievement-context";
+import { SimulationProvider } from "@/contexts/simulation-context";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AchievementProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-            <NavigationBar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/learn" element={<Learn />} />
-              <Route path="/invest" element={<Invest />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </AchievementProvider>
+      <SimulationProvider>
+        <AchievementProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+              <NavigationBar />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/learn" element={<Learn />} />
+                <Route path="/invest" element={<Invest />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </AchievementProvider>
+      </SimulationProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -1,9 +1,8 @@
 import * as React from "react";
-import { Trophy, Sparkles, Users } from "lucide-react";
+import { Trophy, Sparkles, Users, Lock, BookOpen, Check, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PageContainer from "@/components/ui/page-container";
 import { TradingSimulator } from "@/components/ui/trading-simulator";
-import { LessonCard } from "@/components/ui/lesson-card";
 import { Quiz } from "@/components/ui/quiz";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -41,15 +40,87 @@ const modules: Module[] = [
     lessons: [
       {
         id: 1,
-        title: "Lesson 1",
+        title: "What is Investing?",
         description: "Introduction to investing",
         completed: true,
         xp: 50,
       },
-      // Add more lessons...
+      {
+        id: 2,
+        title: "Types of Investments",
+        description: "Different types of investments",
+        completed: true,
+        xp: 50,
+      },
+      {
+        id: 3,
+        title: "Risk and Return",
+        description: "Understanding risk and return",
+        completed: true,
+        xp: 50,
+      },
     ],
   },
-  // Add more modules...
+  {
+    id: 2,
+    title: "Stock Market Basics",
+    description: "Understanding how stocks work",
+    progress: 50,
+    status: "in-progress",
+    lessons: [
+      {
+        id: 4,
+        title: "What are Stocks?",
+        description: "Introduction to stocks",
+        completed: true,
+        xp: 50,
+      },
+      {
+        id: 5,
+        title: "How to Buy Stocks",
+        description: "Guide to buying stocks",
+        completed: false,
+        xp: 50,
+      },
+      {
+        id: 6,
+        title: "Market Analysis",
+        description: "Analyzing the stock market",
+        locked: true,
+        xp: 50,
+      },
+    ],
+  },
+  {
+    id: 3,
+    title: "Advanced Strategies",
+    description: "Take your investing to the next level",
+    progress: 0,
+    status: "locked",
+    lessons: [
+      {
+        id: 7,
+        title: "Portfolio Diversification",
+        description: "Diversifying your portfolio",
+        locked: true,
+        xp: 100,
+      },
+      {
+        id: 8,
+        title: "Technical Analysis",
+        description: "Using technical analysis",
+        locked: true,
+        xp: 100,
+      },
+      {
+        id: 9,
+        title: "Investment Strategies",
+        description: "Advanced investment strategies",
+        locked: true,
+        xp: 100,
+      },
+    ],
+  },
 ];
 
 const Learn = () => {
@@ -73,89 +144,77 @@ const Learn = () => {
   };
 
   return (
-    <PageContainer className="space-y-8">
-      <div className="text-center space-y-4">
+    <PageContainer className="space-y-6">
+      <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold text-gray-900">Learning Path</h1>
         <p className="text-gray-600">Master the art of investing through fun lessons</p>
+      </div>
 
-        <div className="max-w-xl mx-auto bg-white/50 backdrop-blur border rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-primary" />
-              <span className="font-medium">{userXp} XP</span>
-            </div>
-            <span className="text-sm text-muted-foreground">{totalProgress}% Complete</span>
+      <div className="max-w-xl mx-auto bg-white/50 backdrop-blur border rounded-lg p-4">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-primary" />
+            <span className="font-medium">{userXp} XP</span>
           </div>
-          <Progress value={totalProgress} />
+          <span className="text-sm text-muted-foreground">{totalProgress}% Complete</span>
         </div>
+        <Progress value={totalProgress} />
       </div>
 
       <SimulationProvider>
         <TradingSimulator />
       </SimulationProvider>
 
-      <div className="grid gap-6">
-        <AnimatePresence mode="popLayout">
-          {modules.map((module, index) => {
-            const isAccessible = canAccessModule(index);
-
-            return (
-              <motion.div
-                key={module.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.1 }}
-                className={cn(!isAccessible && "opacity-50")}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-xl font-semibold">{module.title}</h2>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">32 peers learning</span>
-                  </div>
-                </div>
-
-                <div className="grid gap-4">
-                  {module.lessons.map((lesson) => (
-                    <LessonCard
-                      key={lesson.id}
-                      title={lesson.title}
-                      description={lesson.description}
-                      completed={lesson.completed}
-                      locked={!isAccessible}
-                      xp={lesson.xp}
-                      progress={lesson.completed ? 100 : 0}
-                      badge={lesson.completed ? "Completed" : module.status === "locked" ? "Locked" : ""}
-                      onClick={() => {
-                        if (!lesson.completed && isAccessible) {
-                          handleLessonComplete(lesson.id, lesson.xp);
-                        }
-                      }}
-                    >
-                      {lesson.quiz && !lesson.completed && isAccessible && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Quiz
-                            {...lesson.quiz}
-                            onComplete={(correct) => {
-                              if (correct) {
-                                handleLessonComplete(lesson.id, lesson.xp);
-                                checkAchievement("quiz_complete", 1);
-                              }
-                            }}
-                          />
-                        </motion.div>
-                      )}
-                    </LessonCard>
-                  ))}
-                </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
+      <div className="space-y-4">
+        {modules.map((module, index) => (
+          <ModuleCard
+            key={module.id}
+            title={module.title}
+            description={module.description}
+            status={module.status}
+            lessons={module.lessons}
+            isAccessible={canAccessModule(index)}
+            handleLessonComplete={handleLessonComplete}
+          />
+        ))}
       </div>
     </PageContainer>
   );
 };
+
+const ModuleCard = ({ title, description, status, lessons, isAccessible, handleLessonComplete }) => (
+  <div className={`bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm ${status === "locked" && "opacity-75"}`}>
+    <div className="flex items-start justify-between mb-4">
+      <div>
+        <h2 className="text-xl font-semibold">{title}</h2>
+        <p className="text-gray-600">{description}</p>
+      </div>
+      <div className={`px-3 py-1 rounded-full text-sm ${status === "completed" ? "bg-success/10 text-success" : status === "in-progress" ? "bg-primary/10 text-primary" : "bg-gray-200 text-gray-600"}`}>
+        {status === "completed" ? "Completed" : status === "in-progress" ? "In Progress" : "Locked"}
+      </div>
+    </div>
+    <div className="space-y-3">
+      {lessons.map((lesson, index) => (
+        <LessonItem key={index} {...lesson} isAccessible={isAccessible} handleLessonComplete={handleLessonComplete} />
+      ))}
+    </div>
+  </div>
+);
+
+const LessonItem = ({ title, description, completed, locked, xp, isAccessible, handleLessonComplete }) => (
+  <div className={`flex items-center gap-4 p-3 rounded-lg ${locked ? 'opacity-50' : 'hover:bg-gray-50'}`}>
+    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completed ? 'bg-success/10 text-success' : locked ? 'bg-gray-200 text-gray-400' : 'bg-primary/10 text-primary'}`}>
+      {completed ? <Check className="w-4 h-4" /> : locked ? <Lock className="w-4 h-4" /> : <BookOpen className="w-4 h-4" />}
+    </div>
+    <div className="flex-1">
+      <span className="font-medium">{title}</span>
+      <p className="text-sm text-gray-600">{description}</p>
+    </div>
+    <span className="text-sm text-gray-600">{xp} XP</span>
+    {!completed && !locked && isAccessible && (
+      <Button onClick={() => handleLessonComplete(title, xp)}>Start Lesson</Button>
+    )}
+  </div>
+);
 
 export default Learn;

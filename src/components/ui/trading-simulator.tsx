@@ -38,6 +38,7 @@ export function TradingSimulator() {
     if (shares > 0) {
       setShares(shares - 1);
       setBalance(balance + stock.price);
+      completeTutorial("basics");
     }
   };
 
