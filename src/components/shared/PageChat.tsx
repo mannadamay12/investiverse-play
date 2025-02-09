@@ -35,8 +35,7 @@ export function PageChat() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`,
-          // 'Authorization': 'Bearer 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',
+          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
           'Cookie': '__cf_bm=OiYdqdxdC1F2sVGQSoll6MKDfjzyLVVe4L0qH3.s0xs-1739088058-1.0.1.1-dvrD6LIOyaHl0YtmzVemdx4ea6qSalgKWMd6z5f7BffBUY2gB_GNRXdALXsN59KJRPg2DADtw8_BIwtoeeDUjQ'
         },
         body: JSON.stringify({
