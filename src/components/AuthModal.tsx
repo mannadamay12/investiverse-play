@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '@/contexts/user-context';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
+  const { setUser } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -44,6 +46,14 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
       }
 
       const data = await response.json();
+      
+      // Store user data in context
+      setUser({
+        id: data.user_id,
+        email: email,
+        token: data.token // if your API returns a token
+      });
+
       // Success
       navigate('/home');
     } catch (err) {

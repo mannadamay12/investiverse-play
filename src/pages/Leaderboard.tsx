@@ -224,7 +224,7 @@ function LeaderboardItem({ entry }: { entry: LeaderboardEntry }) {
         </div>
       </div>
 
-      <Button variant="ghost" size="sm" className="w-full md:w-auto mt-2 md:mt-0">
+      <Button variant="default" size="sm" className="w-full md:w-auto mt-2 md:mt-0">
         Challenge
       </Button>
     </div>
