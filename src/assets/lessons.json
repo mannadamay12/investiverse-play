@@ -10,7 +10,26 @@
           "shortDescription": "Introduction to investing and common terms.",
           "xp": 50,
           "status": "completed",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "This lesson covers the core definition of investing and basic terms every beginner should know.",
+            "keyConcepts": [
+              "Investing is putting money into assets with the expectation of earning a profit or growing that money over time.",
+              "Common investment vehicles include stocks, bonds, and funds.",
+              "Investing differs from saving in that it involves taking on varying degrees of risk for potential returns."
+            ],
+            "practicalApplication": "Start small by identifying a financial goal, then explore easy-to-understand investment vehicles (like index funds) that align with that goal."
+          },
+          "quiz": {
+            "question": "Which statement best describes investing?",
+            "options": [
+              "Storing all your money in a savings account",
+              "Putting money into assets with the expectation of growth",
+              "Borrowing money from friends to start a venture",
+              "Hiding cash at home for emergencies"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_investing_2",
@@ -18,7 +37,26 @@
           "shortDescription": "Learn how saving differs from investing and why it matters.",
           "xp": 50,
           "status": "completed",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "This lesson explains the difference between keeping money in savings and putting it to work through investments.",
+            "keyConcepts": [
+              "Savings are typically stored in low-risk, liquid accounts for short-term needs or emergencies.",
+              "Investments usually involve longer time horizons and higher risk, aiming for growth or income.",
+              "Balancing both saving and investing is crucial for financial stability and long-term wealth."
+            ],
+            "practicalApplication": "Set aside an emergency fund in a savings account, then allocate surplus money into diversified investments for potential growth."
+          },
+          "quiz": {
+            "question": "What is a key difference between saving and investing?",
+            "options": [
+              "Saving involves more risk than investing",
+              "Investing usually offers higher potential returns but with higher risk",
+              "Saving is never recommended for short-term goals",
+              "Investing guarantees returns"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_investing_3",
@@ -26,7 +64,26 @@
           "shortDescription": "Overview of stocks, bonds, mutual funds, and more.",
           "xp": 50,
           "status": "completed",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "Explore the various investment vehicles available, each with different risk and return profiles.",
+            "keyConcepts": [
+              "Stocks represent ownership in a company, often with higher risk and potential for higher returns.",
+              "Bonds are loans to governments or corporations, generally lower risk than stocks but with lower returns.",
+              "Mutual funds and ETFs bundle multiple assets, offering diversification in a single product."
+            ],
+            "practicalApplication": "Compare different assets based on your risk tolerance and financial goals; consider mixing stocks and bonds for balance."
+          },
+          "quiz": {
+            "question": "Which of the following is typically considered the lowest-risk investment?",
+            "options": [
+              "Stocks",
+              "Bonds",
+              "Options",
+              "Cryptocurrency"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_investing_4",
@@ -34,7 +91,26 @@
           "shortDescription": "Discover the power of compounding and long-term investing.",
           "xp": 50,
           "status": "inProgress",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "Learn how reinvesting earnings can exponentially grow your wealth over time.",
+            "keyConcepts": [
+              "Compound interest means earning returns on both the original principal and accumulated interest.",
+              "A longer time horizon amplifies compounding effects, making early investing especially powerful.",
+              "Small, regular contributions can lead to significant growth due to compounding over years."
+            ],
+            "practicalApplication": "Start investing as early as possible, even with modest amounts, and keep contributions consistent to leverage compounding."
+          },
+          "quiz": {
+            "question": "Why is starting to invest early beneficial?",
+            "options": [
+              "It eliminates all investment risk",
+              "It guarantees you’ll beat the market",
+              "It allows compound interest more time to work",
+              "It requires no up-front capital"
+            ],
+            "correctAnswer": 2
+          }
         }
       ]
     },
@@ -49,7 +125,26 @@
           "shortDescription": "Intro to stocks, shareholders, and the concept of ownership.",
           "xp": 50,
           "status": "available",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "This lesson introduces the concept of owning shares in a company and how that translates to potential profits or losses.",
+            "keyConcepts": [
+              "A stock is a security that represents partial ownership of a corporation.",
+              "Shareholders may receive dividends and can vote on company matters.",
+              "Stock prices fluctuate based on market sentiment, company performance, and broader economic trends."
+            ],
+            "practicalApplication": "Research a company you're familiar with—check its ticker symbol, read about recent performance, and observe how stock price changes over time."
+          },
+          "quiz": {
+            "question": "What does owning a share of stock represent?",
+            "options": [
+              "A loan to the company",
+              "Partial ownership in the company",
+              "A guaranteed dividend",
+              "A short-term contract with the company"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_stock_2",
@@ -57,7 +152,26 @@
           "shortDescription": "A guide to stock exchanges, brokers, and placing orders.",
           "xp": 50,
           "status": "available",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "Learn the mechanics of actually purchasing shares, from choosing a broker to executing different order types.",
+            "keyConcepts": [
+              "Brokers act as intermediaries between you and the stock market.",
+              "Common order types include market orders, limit orders, and stop-loss orders.",
+              "Online platforms have democratized stock buying, allowing fractional share purchases in some cases."
+            ],
+            "practicalApplication": "Open a paper trading or micro-investing account, and practice placing small trades to get comfortable with the process."
+          },
+          "quiz": {
+            "question": "Which of the following is NOT a common order type when buying stocks?",
+            "options": [
+              "Market order",
+              "Limit order",
+              "Stop-loss order",
+              "Unlimited order"
+            ],
+            "correctAnswer": 3
+          }
         },
         {
           "id": "lesson_stock_3",
@@ -65,7 +179,26 @@
           "shortDescription": "Learn about tickers, bid/ask prices, and daily changes.",
           "xp": 50,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "This lesson breaks down the key components of a stock quote and how to interpret them.",
+            "keyConcepts": [
+              "A stock ticker identifies a company on an exchange (e.g., AAPL for Apple).",
+              "The bid price is what buyers are willing to pay, and the ask price is what sellers are asking for.",
+              "The day’s range, volume, and percentage change provide insight into stock activity."
+            ],
+            "practicalApplication": "Look up a current stock quote online and identify each element, noting the bid, ask, and the day’s price movement."
+          },
+          "quiz": {
+            "question": "What does the bid price in a stock quote represent?",
+            "options": [
+              "The price at which sellers are willing to sell shares",
+              "The price at which the company buys back shares",
+              "The price at which buyers are willing to purchase shares",
+              "A guaranteed lowest price of the day"
+            ],
+            "correctAnswer": 2
+          }
         },
         {
           "id": "lesson_stock_4",
@@ -73,7 +206,26 @@
           "shortDescription": "Explore how dividends work and why companies pay them.",
           "xp": 50,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Dividends can provide investors with regular income; here's how they function and affect stock investing.",
+            "keyConcepts": [
+              "Dividends are a portion of a company's earnings distributed to shareholders.",
+              "Not all companies pay dividends; some reinvest profits back into growth.",
+              "Dividend yields help compare the income potential of different dividend-paying stocks."
+            ],
+            "practicalApplication": "If seeking passive income, consider adding reliable dividend-paying stocks or ETFs to your portfolio."
+          },
+          "quiz": {
+            "question": "Why might a company choose NOT to pay dividends?",
+            "options": [
+              "It wants to reinvest profits back into growth",
+              "It has no profits and faces bankruptcy",
+              "Paying dividends is illegal",
+              "Shareholders never benefit from dividends"
+            ],
+            "correctAnswer": 0
+          }
         }
       ]
     },
@@ -88,7 +240,26 @@
           "shortDescription": "Discover how ETFs bundle multiple stocks or bonds into one product.",
           "xp": 50,
           "status": "available",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "ETFs (Exchange-Traded Funds) are a straightforward way to invest in a basket of securities at once.",
+            "keyConcepts": [
+              "ETFs trade on exchanges like stocks, offering intraday liquidity.",
+              "They can track indexes, sectors, or thematic strategies.",
+              "Lower expense ratios make ETFs appealing for cost-conscious investors."
+            ],
+            "practicalApplication": "Look up a popular broad-market ETF (e.g., SPY) and see what companies or bonds it holds for instant diversification."
+          },
+          "quiz": {
+            "question": "What is a major advantage of ETFs compared to individual stocks?",
+            "options": [
+              "They are risk-free investments",
+              "They offer built-in diversification",
+              "They always outperform the market",
+              "They pay guaranteed dividends"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_etf_2",
@@ -96,7 +267,26 @@
           "shortDescription": "Compare passive index-tracking funds with actively managed funds.",
           "xp": 50,
           "status": "available",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "Learn the difference between funds that follow a market index and those managed by a professional.",
+            "keyConcepts": [
+              "Index funds passively track a benchmark (e.g., S&P 500), aiming to mirror market performance.",
+              "Active funds rely on managers picking stocks with the goal of outperforming the market.",
+              "Expense ratios are typically lower for index funds due to less active management."
+            ],
+            "practicalApplication": "Compare fees and historical performance of an index fund versus an active fund that invests in the same sector."
+          },
+          "quiz": {
+            "question": "Which statement is TRUE about index funds?",
+            "options": [
+              "They are managed by a high-fee professional portfolio manager",
+              "They always beat actively managed funds",
+              "They aim to match the performance of a specific market index",
+              "They are more volatile than individual stocks"
+            ],
+            "correctAnswer": 2
+          }
         },
         {
           "id": "lesson_etf_3",
@@ -104,7 +294,26 @@
           "shortDescription": "Focus on how specialized ETFs target industries or themes.",
           "xp": 50,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Some ETFs concentrate on specific industries (like tech) or themes (like clean energy).",
+            "keyConcepts": [
+              "Sector ETFs let you invest in focused areas like healthcare, finance, or technology.",
+              "Thematic ETFs track trends like green energy, robotics, or emerging markets.",
+              "While they offer targeted exposure, they can be more volatile than broad-market ETFs."
+            ],
+            "practicalApplication": "Identify a theme you believe will grow long-term and see if there's a corresponding ETF that fits your investment thesis."
+          },
+          "quiz": {
+            "question": "What is a potential downside of investing in sector or thematic ETFs?",
+            "options": [
+              "They are always more expensive than stocks",
+              "They must be held for at least 10 years",
+              "They can be more volatile due to narrower focus",
+              "They guarantee returns"
+            ],
+            "correctAnswer": 2
+          }
         },
         {
           "id": "lesson_etf_4",
@@ -112,7 +321,26 @@
           "shortDescription": "Basic overview of mutual funds, NAV, and management fees.",
           "xp": 50,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Mutual funds pool money from many investors to buy a diversified set of assets.",
+            "keyConcepts": [
+              "The Net Asset Value (NAV) is the price per share of a mutual fund, updated daily.",
+              "Many mutual funds are actively managed, potentially leading to higher expense ratios.",
+              "Unlike ETFs, mutual funds typically trade once a day after the market closes."
+            ],
+            "practicalApplication": "Check if your retirement account offers mutual funds with low fees or stable long-term performance to match your goals."
+          },
+          "quiz": {
+            "question": "How often is the price (NAV) of most mutual funds updated?",
+            "options": [
+              "Continually throughout the trading day",
+              "Once a day after the market closes",
+              "Once a week on Fridays",
+              "Only once a year"
+            ],
+            "correctAnswer": 1
+          }
         }
       ]
     },
@@ -127,7 +355,26 @@
           "shortDescription": "Understanding the risk-reward tradeoff and volatility.",
           "xp": 50,
           "status": "available",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "Explore how higher expected returns often come with higher risks, and what volatility means.",
+            "keyConcepts": [
+              "Risk is the chance that an investment's actual return will deviate from the expected return.",
+              "Volatility measures how drastically prices move over time.",
+              "Balancing risk and reward is essential for building a stable yet growth-oriented portfolio."
+            ],
+            "practicalApplication": "Evaluate your comfort with short-term market swings before choosing high-volatility investments like tech stocks."
+          },
+          "quiz": {
+            "question": "Which statement best describes the risk-reward tradeoff?",
+            "options": [
+              "Higher risk often comes with the potential for higher returns",
+              "Lower risk always guarantees higher returns",
+              "There is no relationship between risk and returns",
+              "Investing in stocks is always less risky than saving"
+            ],
+            "correctAnswer": 0
+          }
         },
         {
           "id": "lesson_risk_2",
@@ -135,7 +382,26 @@
           "shortDescription": "How spreading out investments can lower overall risk.",
           "xp": 50,
           "status": "available",
-          "locked": false
+          "locked": false,
+          "content": {
+            "introduction": "Reducing risk by not putting all your eggs in one basket is a foundational investing principle.",
+            "keyConcepts": [
+              "Diversifying across asset classes (stocks, bonds, ETFs) helps mitigate sector-specific downturns.",
+              "Global diversification can reduce country-specific economic or political risks.",
+              "Correlation measures how assets move in relation to each other—lower correlation often means better diversification."
+            ],
+            "practicalApplication": "Look at your portfolio and see if you're heavily skewed toward one industry or region—consider balancing it out."
+          },
+          "quiz": {
+            "question": "What is the main purpose of diversification?",
+            "options": [
+              "To maximize returns at all costs",
+              "To reduce overall risk in a portfolio",
+              "To only invest in the largest stocks",
+              "To avoid paying any brokerage fees"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_risk_3",
@@ -143,7 +409,26 @@
           "shortDescription": "Explore emotional and cognitive biases like herd mentality.",
           "xp": 50,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Learn how our psychology impacts investing decisions and can lead to less rational behavior.",
+            "keyConcepts": [
+              "Herd mentality: following crowd behavior without proper research.",
+              "Confirmation bias: seeking out information that aligns with pre-held beliefs.",
+              "Loss aversion: the tendency to fear losses more than valuing gains."
+            ],
+            "practicalApplication": "Keep a trading journal to track your decisions and identify moments when emotions or biases affect your moves."
+          },
+          "quiz": {
+            "question": "Which of the following is an example of a common behavioral bias in investing?",
+            "options": [
+              "Believing your first idea is always correct",
+              "Following the crowd without doing personal research",
+              "Buying only stocks from your country of origin",
+              "Never checking any financial news"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_risk_4",
@@ -151,7 +436,26 @@
           "shortDescription": "Align your investments with personal objectives and timeframes.",
           "xp": 50,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Tie your investment strategy to specific life goals—short, medium, or long term.",
+            "keyConcepts": [
+              "Defining clear goals helps determine time horizons and risk tolerance.",
+              "Short-term goals often require more conservative strategies to preserve capital.",
+              "Long-term goals, like retirement, can accommodate more growth-focused investments."
+            ],
+            "practicalApplication": "Write down your top 3 financial goals and estimate how much money or growth you’ll need for each, guiding your investment choices."
+          },
+          "quiz": {
+            "question": "Why is setting clear financial goals important for investing?",
+            "options": [
+              "It guarantees higher returns",
+              "It helps determine time horizons and suitable risk levels",
+              "It requires no capital to start investing",
+              "It immediately eliminates all market risk"
+            ],
+            "correctAnswer": 1
+          }
         }
       ]
     },
@@ -166,7 +470,26 @@
           "shortDescription": "Differences between fundamental and technical analysis.",
           "xp": 100,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Understand the two main approaches to analyzing market opportunities and company value.",
+            "keyConcepts": [
+              "Fundamental analysis examines a company’s financial health, products, and industry position.",
+              "Technical analysis focuses on price charts, volume, and patterns to predict future movement.",
+              "Investors often blend both methods for a fuller perspective."
+            ],
+            "practicalApplication": "Pick a company and try reading a summary of its fundamentals (like P/E ratio) and chart patterns to see if the signals align."
+          },
+          "quiz": {
+            "question": "Which statement is TRUE about technical analysis?",
+            "options": [
+              "It focuses primarily on a company’s financial statements",
+              "It uses price and volume charts to identify trends",
+              "It guarantees accurate future price predictions",
+              "It only applies to large-cap stocks"
+            ],
+            "correctAnswer": 1
+          }
         },
         {
           "id": "lesson_adv_2",
@@ -174,7 +497,26 @@
           "shortDescription": "Key metrics like P/E ratio, ROE, and how to evaluate a company.",
           "xp": 100,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Dive deeper into evaluating a company's intrinsic worth by analyzing its financial statements and key metrics.",
+            "keyConcepts": [
+              "P/E ratio compares a company’s share price to its earnings per share.",
+              "Return on Equity (ROE) measures how effectively management uses equity to generate profits.",
+              "Debt levels, revenue growth, and profit margins also offer vital insight into a company’s stability."
+            ],
+            "practicalApplication": "Look up a company's recent annual report or financial summary and do a quick ratio check—compare your findings to its industry peers."
+          },
+          "quiz": {
+            "question": "What does the P/E ratio represent?",
+            "options": [
+              "Price to Earnings ratio, showing how a stock's price compares to its earnings",
+              "Profit to Expense ratio, indicating how a company handles costs",
+              "Projected Earnings ratio, showing future expected profits",
+              "Price to Equity ratio, measuring shareholder value"
+            ],
+            "correctAnswer": 0
+          }
         },
         {
           "id": "lesson_adv_3",
@@ -182,7 +524,26 @@
           "shortDescription": "Trend lines, support/resistance, and common chart patterns.",
           "xp": 100,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Analyze past price movements to forecast potential future trends or price levels.",
+            "keyConcepts": [
+              "Support levels are prices where demand may push a stock back up, while resistance levels do the opposite.",
+              "Moving averages smooth out price data, helping identify longer-term trends.",
+              "Common chart patterns like ‘head and shoulders’ or ‘triangles’ can signal trend reversals or continuations."
+            ],
+            "practicalApplication": "Pick a stock chart and try identifying at least one support or resistance line—see if recent price action respects those levels."
+          },
+          "quiz": {
+            "question": "Which of the following is commonly used in technical analysis?",
+            "options": [
+              "Support and resistance levels",
+              "Price-to-Earnings ratio",
+              "Annual income statements",
+              "Quarterly dividend announcements only"
+            ],
+            "correctAnswer": 0
+          }
         },
         {
           "id": "lesson_adv_4",
@@ -190,7 +551,26 @@
           "shortDescription": "A high-level overview of derivatives and their risks.",
           "xp": 100,
           "status": "locked",
-          "locked": true
+          "locked": true,
+          "content": {
+            "introduction": "Derivatives like options and futures let you speculate on or hedge against price movements without owning the underlying asset.",
+            "keyConcepts": [
+              "Options give the right, but not the obligation, to buy or sell a stock at a set price by a set date.",
+              "Futures obligate both parties to transact at a predetermined future date and price.",
+              "While these can amplify returns, they also carry higher risk and complexity—unsuitable for beginners without proper research."
+            ],
+            "practicalApplication": "Read a simple overview of how options contracts work—note how you might hedge a large stock position by buying a put option."
+          },
+          "quiz": {
+            "question": "What is a key characteristic of an options contract?",
+            "options": [
+              "It obligates both parties to trade at a set future date",
+              "It can be exercised or allowed to expire without obligation",
+              "It is risk-free for both buyer and seller",
+              "It always results in the underlying stock being purchased"
+            ],
+            "correctAnswer": 1
+          }
         }
       ]
     }

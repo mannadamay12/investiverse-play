@@ -9,6 +9,7 @@ import { TradingSimulator } from "@/components/ui/trading-simulator";
 import { LessonModal } from "@/components/ui/lesson-modal";
 import { Category, Lesson, LessonContent } from "@/types/lesson";
 import { PageChat } from "@/components/shared/PageChat";
+import lessonsData from '@/assets/lessons.json'; // Import the JSON data
 
 interface ModuleCardProps {
   title: string;
@@ -45,44 +46,39 @@ const Learn = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // Add this mock lesson content (you should probably move this to your lessons.json)
-  const getLessonContent = (lessonId: string): LessonContent => ({
-    title: categories
-      .flatMap(c => c.lessons)
-      .find(l => l.id === lessonId)?.title || "",
-    content: `
-      <div class="space-y-6">
-        <section>
-          <h3 class="text-xl font-semibold mb-3">Introduction</h3>
-          <p class="text-gray-700">This is an example lesson content. In a real application, this would be much more detailed and structured.</p>
-        </section>
-        
-        <section>
-          <h3 class="text-xl font-semibold mb-3">Key Concepts</h3>
-          <ul class="list-disc pl-5 space-y-2">
-            <li class="text-gray-700">First key point about ${lessonId}</li>
-            <li class="text-gray-700">Second key point about investing</li>
-            <li class="text-gray-700">Third key point with examples</li>
-          </ul>
-        </section>
-        
-        <section>
-          <h3 class="text-xl font-semibold mb-3">Practical Application</h3>
-          <p class="text-gray-700">Here's how you can apply these concepts in real-world scenarios...</p>
-        </section>
-      </div>
-    `,
-    quiz: {
-      question: "What is the main purpose of diversification?",
-      options: [
-        "To maximize returns",
-        "To reduce risk",
-        "To increase trading frequency",
-        "To minimize taxes"
-      ],
-      correctAnswer: 1
+  const getLessonContent = (lessonId: string): LessonContent | undefined => {
+    for (const category of lessonsData) {
+      for (const lesson of category.lessons) {
+        if (lesson.id === lessonId) {
+          return {
+            title: lesson.title,
+            content: `
+              <div class="space-y-6">
+                <section>
+                  <h3 class="text-xl font-semibold mb-3">Introduction</h3>
+                  <p class="text-gray-700">${lesson.content.introduction}</p>
+                </section>
+                
+                <section>
+                  <h3 class="text-xl font-semibold mb-3">Key Concepts</h3>
+                  <ul class="list-disc pl-5 space-y-2">
+                    ${lesson.content.keyConcepts.map(concept => `<li class="text-gray-700">${concept}</li>`).join('')}
+                  </ul>
+                </section>
+                
+                <section>
+                  <h3 class="text-xl font-semibold mb-3">Practical Application</h3>
+                  <p class="text-gray-700">${lesson.content.practicalApplication}</p>
+                </section>
+              </div>
+            `,
+            quiz: lesson.quiz
+          };
+        }
+      }
     }
-  });
+    return undefined;
+  };
 
   const handleLessonStart = (lesson: SelectedLesson) => {
     setSelectedLesson(lesson);

@@ -5,7 +5,7 @@ import { Toggle } from "@/components/ui/toggle"
 import { Quiz } from "@/components/ui/quiz"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import DOMPurify from 'dompurify' // Add this import
+import DOMPurify from 'dompurify'
 
 interface LessonModalProps {
   open: boolean
