@@ -98,7 +98,7 @@ export default function Leaderboard() {
             <div className="bg-white/80 backdrop-blur p-2 md:p-3 rounded-xl border border-gray-200 text-center">
               <Medal className="w-5 h-5 md:w-6 md:h-6 text-gray-400 mx-auto mb-1" />
               <div className="font-semibold text-sm md:text-base">Sarah K.</div>
-              <div className="text-xs md:text-sm text-gray-600">4,890 XP</div>
+              <div className="text-xs md:text-sm text-gray-600">5,100 XP</div>
             </div>
           </div>
 
@@ -122,7 +122,7 @@ export default function Leaderboard() {
             <div className="bg-white/80 backdrop-blur p-2 md:p-3 rounded-xl border border-gray-200 text-center">
               <Award className="w-5 h-5 md:w-6 md:h-6 text-amber-600 mx-auto mb-1" />
               <div className="font-semibold text-sm md:text-base">Emma R.</div>
-              <div className="text-xs md:text-sm text-gray-600">4,550 XP</div>
+              <div className="text-xs md:text-sm text-gray-600">4,950 XP</div>
             </div>
           </div>
         </div>

@@ -10,22 +10,22 @@ import { PageChat } from "@/components/shared/PageChat";
 
 const mockProfile: UserProfile = {
   id: "1",
-  username: "demo_user",
+  username: "Hackerman",
   avatar: defaultAvatar,
-  bio: "This is a demo profile",
+  bio: "I love this app❤️",
   level: {
-    name: "Level 1",
+    name: "Level 5",
     color: "#FF0000",
     currentXp: 100,
     nextLevelXp: 200
   },
   stats: {
     totalXp: 100,
-    lessonsCompleted: 0,
-    currentStreak: 0,
-    longestStreak: 0,
-    portfolioValue: 0,
-    portfolioGrowth: 0
+    lessonsCompleted: 8,
+    currentStreak: 1,
+    longestStreak: 4,
+    portfolioValue: 25,
+    portfolioGrowth: 80
   },
   badges: [
     { 
