@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Trophy, Sparkles, Users, Lock, BookOpen, Check, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -148,25 +149,27 @@ const Learn = () => {
   };
 
   return (
-    <PageContainer className="space-y-6">
+    <PageContainer className="space-y-6 px-4 md:px-6 max-w-6xl mx-auto">
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">Learning Path</h1>
-        <p className="text-gray-600">Master the art of investing through fun lessons</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Learning Path</h1>
+        <p className="text-sm md:text-base text-gray-600">Master the art of investing through fun lessons</p>
       </div>
 
-      <div className="max-w-xl mx-auto bg-white/50 backdrop-blur border rounded-lg p-4">
+      <div className="w-full md:max-w-xl mx-auto bg-white/50 backdrop-blur border rounded-lg p-3 md:p-4">
         <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-primary" />
-            <span className="font-medium">{userXp} XP</span>
+          <div className="flex items-center gap-1 md:gap-2">
+            <Trophy className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            <span className="text-sm md:text-base font-medium">{userXp} XP</span>
           </div>
-          <span className="text-sm text-muted-foreground">{totalProgress}% Complete</span>
+          <span className="text-xs md:text-sm text-muted-foreground">{totalProgress}% Complete</span>
         </div>
         <Progress value={totalProgress} />
       </div>
 
       <SimulationProvider>
-        <TradingSimulator />
+        <div className="w-full overflow-x-auto">
+          <TradingSimulator />
+        </div>
       </SimulationProvider>
 
       <div className="space-y-4">
@@ -187,13 +190,13 @@ const Learn = () => {
 };
 
 const ModuleCard = ({ title, description, status, lessons, isAccessible, handleLessonComplete }) => (
-  <div className={`bg-white/80 backdrop-blur p-6 rounded-xl border border-gray-200 shadow-sm ${status === "locked" && "opacity-75"}`}>
-    <div className="flex items-start justify-between mb-4">
+  <div className={`bg-white/80 backdrop-blur p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm ${status === "locked" && "opacity-75"}`}>
+    <div className="flex flex-col md:flex-row md:items-start justify-between mb-4 gap-2 md:gap-4">
       <div>
-        <h2 className="text-xl font-semibold">{title}</h2>
-        <p className="text-gray-600">{description}</p>
+        <h2 className="text-lg md:text-xl font-semibold">{title}</h2>
+        <p className="text-sm md:text-base text-gray-600">{description}</p>
       </div>
-      <div className={`px-3 py-1 rounded-full text-sm ${status === "completed" ? "bg-success/10 text-success" : status === "in-progress" ? "bg-primary/10 text-primary" : "bg-gray-200 text-gray-600"}`}>
+      <div className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm ${status === "completed" ? "bg-success/10 text-success" : status === "in-progress" ? "bg-primary/10 text-primary" : "bg-gray-200 text-gray-600"}`}>
         {status === "completed" ? "Completed" : status === "in-progress" ? "In Progress" : "Locked"}
       </div>
     </div>
@@ -206,18 +209,20 @@ const ModuleCard = ({ title, description, status, lessons, isAccessible, handleL
 );
 
 const LessonItem = ({ title, description, completed, locked, xp, isAccessible, handleLessonComplete }) => (
-  <div className={`flex items-center gap-4 p-3 rounded-lg ${locked ? 'opacity-50' : 'hover:bg-gray-50'}`}>
+  <div className={`flex flex-col md:flex-row md:items-center gap-3 md:gap-4 p-3 rounded-lg ${locked ? 'opacity-50' : 'hover:bg-gray-50'}`}>
     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completed ? 'bg-success/10 text-success' : locked ? 'bg-gray-200 text-gray-400' : 'bg-primary/10 text-primary'}`}>
       {completed ? <Check className="w-4 h-4" /> : locked ? <Lock className="w-4 h-4" /> : <BookOpen className="w-4 h-4" />}
     </div>
     <div className="flex-1">
-      <span className="font-medium">{title}</span>
-      <p className="text-sm text-gray-600">{description}</p>
+      <span className="font-medium text-sm md:text-base">{title}</span>
+      <p className="text-xs md:text-sm text-gray-600">{description}</p>
     </div>
-    <span className="text-sm text-gray-600">{xp} XP</span>
-    {!completed && !locked && isAccessible && (
-      <Button onClick={() => handleLessonComplete(title, xp)}>Start Lesson</Button>
-    )}
+    <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto">
+      <span className="text-xs md:text-sm text-gray-600">{xp} XP</span>
+      {!completed && !locked && isAccessible && (
+        <Button size="sm" onClick={() => handleLessonComplete(title, xp)}>Start Lesson</Button>
+      )}
+    </div>
   </div>
 );
 
