@@ -1,54 +1,62 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "@/contexts/UserContext"; // ✅ Import UserContext
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mode: 'signup' | 'login';
+  mode: "signup" | "login";
 }
 
 const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUserId } = useUser(); // ✅ Get setUserId function from UserContext
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
       const response = await fetch(
         `https://fastapi-project-production-fc1c.up.railway.app/${mode}`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
-          mode: 'cors', // Add explicit CORS mode
-          credentials: 'same-origin',
+          mode: "cors",
+          credentials: "same-origin",
           body: JSON.stringify({ email, password }),
         }
       );
 
       if (!response.ok) {
         if (response.status === 0) {
-          throw new Error('Network error - CORS issue or server unavailable');
+          throw new Error("Network error - CORS issue or server unavailable");
         }
         const data = await response.json().catch(() => null);
         throw new Error(data?.detail || `Error: ${response.status}`);
       }
 
       const data = await response.json();
-      // Success
-      navigate('/home');
+
+      // ✅ Store user_id in UserContext and localStorage
+      if (data.user_id) {
+        setUserId(data.user_id);
+      }
+
+      // ✅ Navigate to home page after successful login/signup
+      navigate("/home");
     } catch (err) {
-      console.error('Auth error:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error("Auth error:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +68,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-[#1a1a1a] p-8 rounded-lg w-96">
         <h2 className="text-2xl font-pixel text-white mb-6">
-          {mode === 'signup' ? 'Sign Up' : 'Login'}
+          {mode === "signup" ? "Sign Up" : "Login"}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -83,9 +91,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
               required
             />
           </div>
-          {error && (
-            <div className="text-red-500 text-sm mb-4">{error}</div>
-          )}
+          {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
           <div className="flex justify-between">
             <button
               type="submit"
@@ -95,7 +101,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
               <div className="absolute inset-0 bg-[#e6d9bf] clip-button" />
               <div className="absolute inset-[10%] bg-[#ef623c]" />
               <span className="absolute inset-0 flex items-center justify-center font-pixel text-sm text-white uppercase tracking-wider">
-                {isLoading ? 'Loading...' : mode === 'signup' ? 'Sign Up' : 'Login'}
+                {isLoading ? "Loading..." : mode === "signup" ? "Sign Up" : "Login"}
               </span>
             </button>
             <button

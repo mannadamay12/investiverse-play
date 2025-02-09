@@ -14,6 +14,7 @@ import { AchievementProvider } from "@/contexts/achievement-context";
 import { SimulationProvider } from "@/contexts/simulation-context";
 import { useEffect, useState } from "react";
 import Landing from "./pages/Landing";
+import { UserProvider } from "@/contexts/UserContext"; // ✅ Import UserProvider
 
 const queryClient = new QueryClient();
 
@@ -53,17 +54,19 @@ const AppContent = () => {
 const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-                <SimulationProvider>
-                    <AchievementProvider>
-                        <BrowserRouter>
-                            <Toaster />
-                            <Sonner />
-                            <AppContent />
-                        </BrowserRouter>
-                    </AchievementProvider>
-                </SimulationProvider>
-            </TooltipProvider>
+            <UserProvider> {/* ✅ Wrap App with UserProvider */}
+                <TooltipProvider>
+                    <SimulationProvider>
+                        <AchievementProvider>
+                            <BrowserRouter>
+                                <Toaster />
+                                <Sonner />
+                                <AppContent />
+                            </BrowserRouter>
+                        </AchievementProvider>
+                    </SimulationProvider>
+                </TooltipProvider>
+            </UserProvider>
         </QueryClientProvider>
     );
 };
