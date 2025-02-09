@@ -1,4 +1,3 @@
-// App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import { AchievementProvider } from "@/contexts/achievement-context";
 import { SimulationProvider } from "@/contexts/simulation-context";
 import { useEffect, useState } from "react"; // Import useState
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +44,7 @@ const App = () => {
                                         <Route path="/invest" element={<Invest />} />
                                         <Route path="/leaderboard" element={<Leaderboard />} />
                                         <Route path="/profile" element={<Profile />} />
+                                        <Route path="/landing" element={<Landing />} />
                                         <Route path="*" element={<NotFound />} />
                                     </Routes>
                                 </main>
