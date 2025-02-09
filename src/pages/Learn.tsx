@@ -1,151 +1,96 @@
-
 import * as React from "react";
-import { Trophy, Sparkles, Users, Lock, BookOpen, Check, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Trophy, BookOpen, Check, Lock } from "lucide-react";
 import PageContainer from "@/components/ui/page-container";
-import { TradingSimulator } from "@/components/ui/trading-simulator";
-import { Quiz } from "@/components/ui/quiz";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useAchievements } from "@/contexts/useAchievements";
+import { useLessons } from "@/hooks/useLessons";
 import { SimulationProvider } from "@/contexts/simulation-context";
+import { TradingSimulator } from "@/components/ui/trading-simulator";
+import { LessonModal } from "@/components/ui/lesson-modal";
+import { Category, Lesson, LessonContent } from "@/types/lesson";
 
-// Define the type for a module
-interface Module {
-  id: number;
+interface ModuleCardProps {
   title: string;
   description: string;
-  progress: number;
-  status: "completed" | "locked" | "in-progress";
+  status: "completed" | "in-progress" | "locked";
   lessons: Lesson[];
+  isAccessible: boolean;
+  handleLessonComplete: (lessonId: string, xp: number) => void;
+  handleLessonStart: (lesson: SelectedLesson) => void;
 }
 
-interface Lesson {
-  id: number;
+interface LessonItemProps extends Lesson {
+  isAccessible: boolean;
+  handleLessonStart: (lesson: { id: string; title: string; xp: number }) => void;
+}
+
+interface SelectedLesson {
+  id: string;
   title: string;
-  description: string;
-  completed: boolean;
-  locked?: boolean;
   xp: number;
 }
 
-// Mock data - in a real app this would come from an API
-const modules: Module[] = [
-  {
-    id: 1,
-    title: "Investing Basics",
-    description: "Foundation of successful investing",
-    progress: 100,
-    status: "completed",
-    lessons: [
-      {
-        id: 1,
-        title: "What is Investing?",
-        description: "Introduction to investing",
-        completed: true,
-        xp: 50,
-      },
-      {
-        id: 2,
-        title: "Types of Investments",
-        description: "Different types of investments",
-        completed: true,
-        xp: 50,
-      },
-      {
-        id: 3,
-        title: "Risk and Return",
-        description: "Understanding risk and return",
-        completed: true,
-        xp: 50,
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Stock Market Basics",
-    description: "Understanding how stocks work",
-    progress: 50,
-    status: "in-progress",
-    lessons: [
-      {
-        id: 4,
-        title: "What are Stocks?",
-        description: "Introduction to stocks",
-        completed: true,
-        xp: 50,
-      },
-      {
-        id: 5,
-        title: "How to Buy Stocks",
-        description: "Guide to buying stocks",
-        completed: false,
-        xp: 50,
-      },
-      {
-        id: 6,
-        title: "Market Analysis",
-        description: "Analyzing the stock market",
-        completed: false,
-        locked: true,
-        xp: 50,
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "Advanced Strategies",
-    description: "Take your investing to the next level",
-    progress: 0,
-    status: "locked",
-    lessons: [
-      {
-        id: 7,
-        title: "Portfolio Diversification",
-        description: "Diversifying your portfolio",
-        completed: false,
-        locked: true,
-        xp: 100,
-      },
-      {
-        id: 8,
-        title: "Technical Analysis",
-        description: "Using technical analysis",
-        completed: false,
-        locked: true,
-        xp: 100,
-      },
-      {
-        id: 9,
-        title: "Investment Strategies",
-        description: "Advanced investment strategies",
-        completed: false,
-        locked: true,
-        xp: 100,
-      },
-    ],
-  },
-];
-
 const Learn = () => {
   const [userXp, setUserXp] = React.useState(150);
-  const { checkAchievement } = useAchievements();
-  const [completedLessons, setCompletedLessons] = React.useState<number[]>([]);
-  const totalProgress = Math.round(
-    (modules.reduce((acc, m) => acc + m.progress, 0) / (modules.length * 100)) * 100
-  );
+  const { categories, loading, error, getCategoryProgress, getCategoryStatus } = useLessons();
+  const [selectedLesson, setSelectedLesson] = React.useState<SelectedLesson | null>(null);
 
-  const handleLessonComplete = (lessonId: number, xpGained: number) => {
-    setCompletedLessons((prev) => [...prev, lessonId]);
-    setUserXp((prev) => prev + xpGained);
-    checkAchievement("lesson_complete", completedLessons.length + 1);
+  const totalProgress = categories.length > 0
+    ? Math.round(
+        categories.reduce((acc, cat) => acc + getCategoryProgress(cat.id), 0) / categories.length
+      )
+    : 0;
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  // Add this mock lesson content (you should probably move this to your lessons.json)
+  const getLessonContent = (lessonId: string): LessonContent => ({
+    title: categories
+      .flatMap(c => c.lessons)
+      .find(l => l.id === lessonId)?.title || "",
+    content: `
+      <div class="space-y-6">
+        <section>
+          <h3 class="text-xl font-semibold mb-3">Introduction</h3>
+          <p class="text-gray-700">This is an example lesson content. In a real application, this would be much more detailed and structured.</p>
+        </section>
+        
+        <section>
+          <h3 class="text-xl font-semibold mb-3">Key Concepts</h3>
+          <ul class="list-disc pl-5 space-y-2">
+            <li class="text-gray-700">First key point about ${lessonId}</li>
+            <li class="text-gray-700">Second key point about investing</li>
+            <li class="text-gray-700">Third key point with examples</li>
+          </ul>
+        </section>
+        
+        <section>
+          <h3 class="text-xl font-semibold mb-3">Practical Application</h3>
+          <p class="text-gray-700">Here's how you can apply these concepts in real-world scenarios...</p>
+        </section>
+      </div>
+    `,
+    quiz: {
+      question: "What is the main purpose of diversification?",
+      options: [
+        "To maximize returns",
+        "To reduce risk",
+        "To increase trading frequency",
+        "To minimize taxes"
+      ],
+      correctAnswer: 1
+    }
+  });
+
+  const handleLessonStart = (lesson: SelectedLesson) => {
+    setSelectedLesson(lesson);
   };
 
-  const canAccessModule = (moduleIndex: number) => {
-    if (moduleIndex === 0) return true;
-    const prevModule = modules[moduleIndex - 1];
-    return prevModule.progress === 100;
+  const handleLessonComplete = (lessonId: string, xp: number) => {
+    // Your existing completion logic
+    setUserXp(prev => prev + xp);
+    setSelectedLesson(null);
   };
 
   return (
@@ -172,16 +117,30 @@ const Learn = () => {
         </div>
       </SimulationProvider>
 
+      {selectedLesson && (
+        <LessonModal
+          open={!!selectedLesson}
+          onOpenChange={(open) => !open && setSelectedLesson(null)}
+          lesson={getLessonContent(selectedLesson.id)}
+          onComplete={(success) => {
+            if (success) {
+              handleLessonComplete(selectedLesson.id, selectedLesson.xp);
+            }
+          }}
+        />
+      )}
+
       <div className="space-y-4">
-        {modules.map((module, index) => (
+        {categories.map((category, index) => (
           <ModuleCard
-            key={module.id}
-            title={module.title}
-            description={module.description}
-            status={module.status}
-            lessons={module.lessons}
-            isAccessible={canAccessModule(index)}
+            key={category.id}
+            title={category.title}
+            description={category.description}
+            status={getCategoryStatus(category.id)}
+            lessons={category.lessons}
+            isAccessible={index === 0 || getCategoryStatus(categories[index - 1].id) === 'completed'}
             handleLessonComplete={handleLessonComplete}
+            handleLessonStart={handleLessonStart}
           />
         ))}
       </div>
@@ -189,7 +148,7 @@ const Learn = () => {
   );
 };
 
-const ModuleCard = ({ title, description, status, lessons, isAccessible, handleLessonComplete }) => (
+const ModuleCard: React.FC<ModuleCardProps> = ({ title, description, status, lessons, isAccessible, handleLessonComplete, handleLessonStart }) => (
   <div className={`bg-white/80 backdrop-blur p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm ${status === "locked" && "opacity-75"}`}>
     <div className="flex flex-col md:flex-row md:items-start justify-between mb-4 gap-2 md:gap-4">
       <div>
@@ -202,13 +161,13 @@ const ModuleCard = ({ title, description, status, lessons, isAccessible, handleL
     </div>
     <div className="space-y-3">
       {lessons.map((lesson, index) => (
-        <LessonItem key={index} {...lesson} isAccessible={isAccessible} handleLessonComplete={handleLessonComplete} />
+        <LessonItem key={index} {...lesson} isAccessible={isAccessible} handleLessonStart={handleLessonStart} />
       ))}
     </div>
   </div>
 );
 
-const LessonItem = ({ title, description, completed, locked, xp, isAccessible, handleLessonComplete }) => (
+const LessonItem: React.FC<LessonItemProps> = ({ id, title, description, completed, locked, xp, isAccessible, handleLessonStart }) => (
   <div className={`flex flex-col md:flex-row md:items-center gap-3 md:gap-4 p-3 rounded-lg ${locked ? 'opacity-50' : 'hover:bg-gray-50'}`}>
     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completed ? 'bg-success/10 text-success' : locked ? 'bg-gray-200 text-gray-400' : 'bg-primary/10 text-primary'}`}>
       {completed ? <Check className="w-4 h-4" /> : locked ? <Lock className="w-4 h-4" /> : <BookOpen className="w-4 h-4" />}
@@ -220,7 +179,12 @@ const LessonItem = ({ title, description, completed, locked, xp, isAccessible, h
     <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto">
       <span className="text-xs md:text-sm text-gray-600">{xp} XP</span>
       {!completed && !locked && isAccessible && (
-        <Button size="sm" onClick={() => handleLessonComplete(title, xp)}>Start Lesson</Button>
+        <Button 
+          size="sm" 
+          onClick={() => handleLessonStart({ id, title, xp })}
+        >
+          Start Lesson
+        </Button>
       )}
     </div>
   </div>

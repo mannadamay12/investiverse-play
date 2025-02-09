@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { StockDataPoint } from '../../utils/stockDataProcessor';
+import { StockDataPoint } from '@/types/stock';
 
 interface PortfolioChartProps {
   data: StockDataPoint[];
@@ -15,9 +15,9 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({
   height = "400px",
   isLoading = false 
 }) => {
-  if (isLoading) {
+  if (isLoading || !data?.length) {
     return (
-      <div className={`h-[${height}] flex items-center justify-center`}>
+      <div style={{ height }} className="flex items-center justify-center">
         <div className="animate-pulse">Loading chart...</div>
       </div>
     );
@@ -40,21 +40,14 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({
   };
 
   return (
-    <div className={`h-[${height}] w-full`}>
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={data}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
+    <div style={{ height, width: '100%' }}>
+      <ResponsiveContainer>
+        <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="date" 
             tickFormatter={formatDate}
+            interval="preserveStartEnd"
           />
           <YAxis 
             tickFormatter={formatCurrency}
@@ -64,11 +57,12 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({
             formatter={(value: number) => formatCurrency(value)}
             labelFormatter={(label) => formatDate(label as string)}
           />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="#8884d8"
-            activeDot={{ r: 8 }}
+          <Line 
+            type="monotone" 
+            dataKey="value" 
+            stroke="#4f46e5" 
+            strokeWidth={2}
+            dot={false}
           />
         </LineChart>
       </ResponsiveContainer>

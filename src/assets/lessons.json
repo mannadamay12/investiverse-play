@@ -1,0 +1,198 @@
+[
+    {
+      "id": "cat_investing_basics",
+      "title": "Investing Basics",
+      "description": "Foundation of successful investing for novices.",
+      "lessons": [
+        {
+          "id": "lesson_investing_1",
+          "title": "What is Investing?",
+          "shortDescription": "Introduction to investing and common terms.",
+          "xp": 50,
+          "status": "completed",
+          "locked": false
+        },
+        {
+          "id": "lesson_investing_2",
+          "title": "Saving vs. Investing",
+          "shortDescription": "Learn how saving differs from investing and why it matters.",
+          "xp": 50,
+          "status": "completed",
+          "locked": false
+        },
+        {
+          "id": "lesson_investing_3",
+          "title": "Types of Investments",
+          "shortDescription": "Overview of stocks, bonds, mutual funds, and more.",
+          "xp": 50,
+          "status": "completed",
+          "locked": false
+        },
+        {
+          "id": "lesson_investing_4",
+          "title": "Compound Interest & Time Horizon",
+          "shortDescription": "Discover the power of compounding and long-term investing.",
+          "xp": 50,
+          "status": "inProgress",
+          "locked": false
+        }
+      ]
+    },
+    {
+      "id": "cat_stock_market_basics",
+      "title": "Stock Market Basics",
+      "description": "Understanding how stocks work and how to buy them.",
+      "lessons": [
+        {
+          "id": "lesson_stock_1",
+          "title": "What Are Stocks?",
+          "shortDescription": "Intro to stocks, shareholders, and the concept of ownership.",
+          "xp": 50,
+          "status": "available",
+          "locked": false
+        },
+        {
+          "id": "lesson_stock_2",
+          "title": "How to Buy Stocks",
+          "shortDescription": "A guide to stock exchanges, brokers, and placing orders.",
+          "xp": 50,
+          "status": "available",
+          "locked": false
+        },
+        {
+          "id": "lesson_stock_3",
+          "title": "Reading Stock Quotes",
+          "shortDescription": "Learn about tickers, bid/ask prices, and daily changes.",
+          "xp": 50,
+          "status": "locked",
+          "locked": true
+        },
+        {
+          "id": "lesson_stock_4",
+          "title": "Understanding Dividends",
+          "shortDescription": "Explore how dividends work and why companies pay them.",
+          "xp": 50,
+          "status": "locked",
+          "locked": true
+        }
+      ]
+    },
+    {
+      "id": "cat_etfs_funds",
+      "title": "ETFs & Funds",
+      "description": "Learn about different funds and how they can diversify your portfolio.",
+      "lessons": [
+        {
+          "id": "lesson_etf_1",
+          "title": "What Is an ETF?",
+          "shortDescription": "Discover how ETFs bundle multiple stocks or bonds into one product.",
+          "xp": 50,
+          "status": "available",
+          "locked": false
+        },
+        {
+          "id": "lesson_etf_2",
+          "title": "Index Funds vs. Active Funds",
+          "shortDescription": "Compare passive index-tracking funds with actively managed funds.",
+          "xp": 50,
+          "status": "available",
+          "locked": false
+        },
+        {
+          "id": "lesson_etf_3",
+          "title": "Sector & Thematic ETFs",
+          "shortDescription": "Focus on how specialized ETFs target industries or themes.",
+          "xp": 50,
+          "status": "locked",
+          "locked": true
+        },
+        {
+          "id": "lesson_etf_4",
+          "title": "Mutual Funds 101",
+          "shortDescription": "Basic overview of mutual funds, NAV, and management fees.",
+          "xp": 50,
+          "status": "locked",
+          "locked": true
+        }
+      ]
+    },
+    {
+      "id": "cat_risk_management",
+      "title": "Risk Management & Behavior",
+      "description": "Learn to manage risk and overcome common biases in investing.",
+      "lessons": [
+        {
+          "id": "lesson_risk_1",
+          "title": "Risk & Return",
+          "shortDescription": "Understanding the risk-reward tradeoff and volatility.",
+          "xp": 50,
+          "status": "available",
+          "locked": false
+        },
+        {
+          "id": "lesson_risk_2",
+          "title": "Diversification Strategies",
+          "shortDescription": "How spreading out investments can lower overall risk.",
+          "xp": 50,
+          "status": "available",
+          "locked": false
+        },
+        {
+          "id": "lesson_risk_3",
+          "title": "Behavioral Biases",
+          "shortDescription": "Explore emotional and cognitive biases like herd mentality.",
+          "xp": 50,
+          "status": "locked",
+          "locked": true
+        },
+        {
+          "id": "lesson_risk_4",
+          "title": "Setting Financial Goals",
+          "shortDescription": "Align your investments with personal objectives and timeframes.",
+          "xp": 50,
+          "status": "locked",
+          "locked": true
+        }
+      ]
+    },
+    {
+      "id": "cat_advanced_strategies",
+      "title": "Advanced Strategies",
+      "description": "Take your investing to the next level with deeper insights.",
+      "lessons": [
+        {
+          "id": "lesson_adv_1",
+          "title": "Market Analysis (Intro)",
+          "shortDescription": "Differences between fundamental and technical analysis.",
+          "xp": 100,
+          "status": "locked",
+          "locked": true
+        },
+        {
+          "id": "lesson_adv_2",
+          "title": "Fundamental Analysis Basics",
+          "shortDescription": "Key metrics like P/E ratio, ROE, and how to evaluate a company.",
+          "xp": 100,
+          "status": "locked",
+          "locked": true
+        },
+        {
+          "id": "lesson_adv_3",
+          "title": "Technical Analysis Basics",
+          "shortDescription": "Trend lines, support/resistance, and common chart patterns.",
+          "xp": 100,
+          "status": "locked",
+          "locked": true
+        },
+        {
+          "id": "lesson_adv_4",
+          "title": "Options & Futures (Intro)",
+          "shortDescription": "A high-level overview of derivatives and their risks.",
+          "xp": 100,
+          "status": "locked",
+          "locked": true
+        }
+      ]
+    }
+  ]
+  

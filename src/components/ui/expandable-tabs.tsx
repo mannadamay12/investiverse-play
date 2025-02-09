@@ -2,14 +2,14 @@ import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOnClickOutside } from "usehooks-ts";
 import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, LucideProps } from "lucide-react";
 import { Link } from 'react-router-dom'; // Import Link
 
 interface Tab {
     title: string;
-    icon: LucideIcon;
+    icon: React.ComponentType<LucideProps>;
     type?: never;
-    to?: string; // Add 'to' prop
+    to: string; // Add 'to' prop
 }
 
 interface Separator {
@@ -25,6 +25,8 @@ interface ExpandableTabsProps {
     tabs: TabItem[];
     className?: string;
     activeColor?: string;
+    activeIndex?: number;
+    isExpanded?: boolean;
     onChange?: (index: number | null) => void;
 }
 

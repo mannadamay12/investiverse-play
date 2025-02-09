@@ -11,9 +11,12 @@ import PageContainer from "@/components/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { processStockData, getAvailableSymbols } from '@/utils/stockDataProcessor';
+import { processStockData, getAvailableSymbols, getStockDataForSymbol, getEnhancedStockData } from '@/utils/stockDataProcessor';
+import { EnhancedStockData, StockData, StockDataPoint } from '@/types/stock';
+import stockData from '@/assets/dow30_daily_close.json';
+import { InvestModal } from "@/components/invest/InvestModal";
 
-interface MockStockData {
+interface stockData {
   name: string;
   price: number;
   change: number;
@@ -26,73 +29,75 @@ const Invest = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSymbol, setSelectedSymbol] = useState('AAPL');
-  const [chartData, setChartData] = useState([]);
-  
-  // Initialize mockStockData with proper structure
-  const [mockStockData, setMockStockData] = useState<Record<string, MockStockData>>(() => {
-    const symbols = getAvailableSymbols();
-    return Object.fromEntries(
-      symbols.map(symbol => [
-        symbol,
-        {
-          name: symbol,
-          price: 0,
-          change: 0,
-          tag: 'tech'
-        }
-      ])
-    );
-  });
+  const [stocksData, setStocksData] = useState<Record<string, EnhancedStockData>>({});
+  const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
 
-  // Check for achievements
-  useEffect(() => {
-    if (state.portfolio.length >= 5 && !hasAchievement("diversified_portfolio")) {
-      awardAchievement("diversified_portfolio");
-    }
-    if (state.watchlist.length >= 3 && !hasAchievement("watch_and_learn")) {
-      awardAchievement("watch_and_learn");
-    }
-  }, [state.portfolio.length, state.watchlist.length, awardAchievement, hasAchievement]);
+  const chartData = useMemo(() => {
+    if (!selectedSymbol || !stockData[selectedSymbol]) return [];
+    
+    return Object.entries(stockData[selectedSymbol])
+      .map(([date, value]) => ({
+        date,
+        value: value as number
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [selectedSymbol]);
 
   useEffect(() => {
-    // Simulate loading state
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
+    const enhanced = getAvailableSymbols().reduce((acc, symbol) => {
+      acc[symbol] = getEnhancedStockData(symbol);
+      return acc;
+    }, {} as Record<string, EnhancedStockData>);
+    
+    setStocksData(enhanced);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    setIsLoading(true);
-    const data = processStockData(selectedSymbol);
-    setChartData(data);
-    
-    // Update mockStockData with latest price
-    if (data.length > 0) {
-      setMockStockData(prev => ({
-        ...prev,
-        [selectedSymbol]: {
-          ...prev[selectedSymbol],
-          price: data[data.length - 1].value,
-          change: ((data[data.length - 1].value - data[0].value) / data[0].value) * 100
-        }
-      }));
-    }
-    
-    setIsLoading(false);
+    // Simulate loading
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
   }, [selectedSymbol]);
 
   const handleInvest = (symbol: string, amount: number) => {
-    const price = mockStockData[symbol]?.price || 0;
-    const shares = amount / price;
+    const stockInfo = stocksData[symbol];
+    if (!stockInfo) return;
+
+    const shares = amount / stockInfo.price;
     
-    executeTrade(symbol, shares, price);
+    executeTrade(symbol, shares, stockInfo.price);
     toast({
       title: "Investment Successful!",
-      description: `You invested $${amount} in ${symbol}`,
+      description: `You invested $${amount} in ${stockInfo.name}`,
     });
     
-    // Award achievement for first investment
     if (state.portfolio.length === 0) {
       awardAchievement("first_investment");
+    }
+  };
+
+  const handleWatchlistToggle = (symbol: string) => {
+    if (state.watchlist.includes(symbol)) {
+      removeFromWatchlist(symbol);
+      toast({
+        title: "Removed from Watchlist",
+        description: `${symbol} has been removed from your watchlist`,
+      });
+    } else {
+      addToWatchlist(symbol);
+      toast({
+        title: "Added to Watchlist",
+        description: `${symbol} has been added to your watchlist`,
+      });
+    }
+  };
+
+  const handleDetailedInvest = (amount: number, orderType: string) => {
+    handleInvest(selectedSymbol, amount);
+    
+    // Award achievement for using advanced trading
+    if (!hasAchievement("advanced_trader")) {
+      awardAchievement("advanced_trader");
     }
   };
 
@@ -126,10 +131,20 @@ const Invest = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h2 className="text-xl font-semibold">Portfolio Overview</h2>
           <div className="flex gap-2 w-full sm:w-auto">
-            <Button variant="outline" size="sm" className="flex-1 sm:flex-initial">
-              <Eye className="w-4 h-4 mr-2" /> Watchlist
+            <Button 
+              variant={state.watchlist.includes(selectedSymbol) ? "default" : "outline"}
+              size="sm" 
+              className="flex-1 sm:flex-initial"
+              onClick={() => handleWatchlistToggle(selectedSymbol)}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              {state.watchlist.includes(selectedSymbol) ? 'Watching' : 'Watch'}
             </Button>
-            <Button size="sm" className="flex-1 sm:flex-initial">
+            <Button 
+              size="sm" 
+              className="flex-1 sm:flex-initial"
+              onClick={() => setIsInvestModalOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2" /> Invest Now
             </Button>
           </div>
@@ -140,7 +155,7 @@ const Invest = () => {
             onChange={(e) => setSelectedSymbol(e.target.value)}
             className="block w-full max-w-xs px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
-            {getAvailableSymbols().map((symbol) => (
+            {Object.keys(stockData).map((symbol) => (
               <option key={symbol} value={symbol}>
                 {symbol}
               </option>
@@ -149,10 +164,19 @@ const Invest = () => {
         </div>
         <PortfolioChart 
           data={chartData}
-          height="300px"
+          symbol={selectedSymbol}
           isLoading={isLoading}
+          height="400px"
         />
       </Card>
+
+      <InvestModal
+        isOpen={isInvestModalOpen}
+        onClose={() => setIsInvestModalOpen(false)}
+        onInvest={handleDetailedInvest}
+        symbol={selectedSymbol}
+        currentPrice={stocksData[selectedSymbol]?.price ?? 0}
+      />
 
       {/* Portfolio Analytics - with loading state */}
       {state.portfolio.length > 0 && (
@@ -181,15 +205,15 @@ const Invest = () => {
                 </Card>
               ))
             ) : (
-              Object.entries(mockStockData).map(([symbol, data]) => (
+              Object.values(stocksData).map((stock) => (
                 <QuickInvestCard
-                  key={symbol}
-                  symbol={symbol}
-                  name={data.name}
-                  price={data.price}
-                  change={data.change}
-                  tag={data.tag}
-                  onInvest={(amount) => handleInvest(symbol, amount)}
+                  key={stock.symbol}
+                  symbol={stock.symbol}
+                  name={stock.name}
+                  price={stock.price}
+                  change={stock.change}
+                  tag={stock.tag}
+                  onInvest={(amount) => handleInvest(stock.symbol, amount)}
                 />
               ))
             )}
@@ -207,9 +231,15 @@ const Invest = () => {
                   <div className="h-24 bg-gray-200 rounded"></div>
                 </Card>
               ))
+            ) : state.watchlist.length === 0 ? (
+              <Card className="p-4">
+                <p className="text-center text-muted-foreground">
+                  Your watchlist is empty. Add stocks to track them.
+                </p>
+              </Card>
             ) : (
               state.watchlist.map((symbol) => {
-                const data = mockStockData[symbol];
+                const data = stocksData[symbol];
                 return (
                   <WatchlistCard
                     key={symbol}
@@ -218,7 +248,7 @@ const Invest = () => {
                     price={data.price}
                     change={data.change}
                     isWatched={true}
-                    onToggleWatch={() => removeFromWatchlist(symbol)}
+                    onToggleWatch={() => handleWatchlistToggle(symbol)}
                   />
                 );
               })

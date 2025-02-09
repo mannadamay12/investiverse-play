@@ -1,74 +1,53 @@
-import { useState, useEffect } from "react";
-import { generateHistoricalData, HistoricalDataPoint } from "@/utils/mockData";
-import { Portfolio } from "@/types";
+import { create } from 'zustand';
+import { Portfolio } from '../types/portfolio';
 import stockData from '../assets/dow30_daily_close.json';
+
 interface SimulationState {
-  portfolio: Portfolio[];
-  watchlist: string[];
-  historicalData: HistoricalDataPoint[];
-  portfolioValue: number;
+  portfolio: Portfolio[];  // Array of user's stock holdings
+  watchlist: string[];    // Array of stock symbols user is watching
+  cash: number;           // User's available cash
+
+  // Functions to modify state
+  addToWatchlist: (symbol: string) => void;
+  removeFromWatchlist: (symbol: string) => void;
+  executeTrade: (symbol: string, shares: number, price: number) => void;
 }
 
-export const useSimulation = () => {
-  const getHistoricalPrices = (symbol: string) => {
-    return Object.entries(stockData[symbol] || {})
-      .map(([date, price]) => ({
-        date,
-        price
-      }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  };
-  const [state, setState] = useState<SimulationState>({
-    portfolio: [],
-    watchlist: [],
-    historicalData: generateHistoricalData(),
-    portfolioValue: 10000, // Starting portfolio value
-  });
+export const useSimulation = create<SimulationState>((set) => ({
+  portfolio: [],
+  watchlist: [],
+  cash: 10000,
 
-  // Update historical data periodically
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setState(prev => ({
-        ...prev,
-        historicalData: getHistoricalPrices(prev.portfolio[0]?.symbol || 'AAPL')
-      }));
-    }, 60000); // Update every minute
+  addToWatchlist: (symbol) => set((state) => ({
+    watchlist: state.watchlist.includes(symbol) 
+      ? state.watchlist 
+      : [...state.watchlist, symbol]
+  })),
 
-    return () => clearInterval(interval);
-  }, []);
+  removeFromWatchlist: (symbol) => set((state) => ({
+    watchlist: state.watchlist.filter(s => s !== symbol)
+  })),
 
-  // Update historical data when portfolio value changes
-  useEffect(() => {
-    const newPortfolioValue = calculatePortfolioValue(state.portfolio);
-    if (newPortfolioValue !== state.portfolioValue) {
-      setState(prev => ({
-        ...prev,
-        portfolioValue: newPortfolioValue,
-        historicalData: generateHistoricalData(30, newPortfolioValue)
-      }));
-    }
-  }, [state.portfolio]);
+  executeTrade: (symbol, shares, price) => set((state) => {
+    const totalCost = shares * price;
+    if (totalCost > state.cash) return state;
 
-  const executeTrade = (trade: Trade) => {
-    // ...existing code...
-  };
+    const existingPosition = state.portfolio.find(p => p.symbol === symbol);
+    const newPortfolio = existingPosition
+      ? state.portfolio.map(p => 
+          p.symbol === symbol
+            ? {
+                symbol,
+                shares: p.shares + shares,
+                averagePrice: (p.averagePrice * p.shares + price * shares) / (p.shares + shares)
+              }
+            : p
+        )
+      : [...state.portfolio, { symbol, shares, averagePrice: price }];
 
-  const addToWatchlist = (symbol: string) => {
-    // ...existing code...
-  };
-
-  const removeFromWatchlist = (symbol: string) => {
-    // ...existing code...
-  };
-
-  const calculatePortfolioValue = (portfolio: Portfolio[]): number => {
-    return portfolio.reduce((total, holding) => total + holding.shares * holding.price, 0);
-  };
-
-  return {
-    state,
-    executeTrade,
-    addToWatchlist,
-    removeFromWatchlist
-  };
-};
+    return {
+      portfolio: newPortfolio,
+      cash: state.cash - totalCost
+    };
+  }),
+}));

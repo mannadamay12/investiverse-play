@@ -1,18 +1,26 @@
-
+import { useState } from "react";
 import image from "../assets/landing.jpg";
-import { Link } from "react-router-dom";
+import AuthModal from "../components/AuthModal";
 
 const Landing = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'signup' | 'login'>('signup');
+
+  const openModal = (mode: 'signup' | 'login') => {
+    setModalMode(mode);
+    setModalOpen(true);
+  };
+
   return (
-    <div className="min-h-screen overflow-hidden" 
+    <div className="h-screen fixed inset-0 overflow-hidden" 
       style={{
         backgroundImage: `url(${image})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}>
-      <main className="container mx-auto px-4 py-8 md:py-16 relative">
-        <div className="flex flex-col items-center justify-center min-h-[80vh] text-center">
+      <main className="h-full flex items-center justify-center relative">
+        <div className="flex flex-col items-center justify-center text-center">
           <h1 className="text-4xl md:text-6xl font-pixel text-white mb-6">
             Welcome to Investiverse
           </h1>
@@ -20,8 +28,8 @@ const Landing = () => {
             Learn, invest, and compete in a risk-free environment
           </p>
           <div className="space-x-6">
-            <Link 
-              to="/signup" 
+            <button 
+              onClick={() => openModal('signup')}
               className="relative inline-block w-[140px] h-[50px] group"
             >
               <div className="absolute inset-0 bg-[#e6d9bf] clip-button" />
@@ -29,9 +37,9 @@ const Landing = () => {
               <span className="absolute inset-0 flex items-center justify-center font-pixel text-sm text-white uppercase tracking-wider">
                 Sign Up
               </span>
-            </Link>
-            <Link 
-              to="/login" 
+            </button>
+            <button 
+              onClick={() => openModal('login')}
               className="relative inline-block w-[140px] h-[50px] group"
             >
               <div className="absolute inset-0 bg-[#e6d9bf] clip-button" />
@@ -39,10 +47,17 @@ const Landing = () => {
               <span className="absolute inset-0 flex items-center justify-center font-pixel text-sm text-white uppercase tracking-wider">
                 Login
               </span>
-            </Link>
+            </button>
           </div>
         </div>
       </main>
+
+      <AuthModal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        mode={modalMode}
+      />
+
       <style>
         {`
           .clip-button {

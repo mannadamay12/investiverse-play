@@ -1,6 +1,6 @@
-import { Eye, EyeOff, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 
 interface WatchlistCardProps {
   symbol: string;
@@ -11,26 +11,34 @@ interface WatchlistCardProps {
   onToggleWatch: () => void;
 }
 
-export function WatchlistCard({
+export const WatchlistCard: React.FC<WatchlistCardProps> = ({
   symbol,
   name,
   price,
   change,
   isWatched,
-  onToggleWatch,
-}: WatchlistCardProps) {
+  onToggleWatch
+}) => {
+  const changeColor = change >= 0 ? 'text-green-600' : 'text-red-600';
+
   return (
     <Card className="p-4">
       <div className="flex justify-between items-start">
         <div>
-          <div className="font-semibold">{symbol}</div>
-          <div className="text-sm text-muted-foreground">{name}</div>
+          <h3 className="font-semibold">{symbol}</h3>
+          <p className="text-sm text-gray-600">{name}</p>
+          <p className="text-sm font-mono mt-1">
+            ${price.toFixed(2)}
+            <span className={`ml-2 ${changeColor}`}>
+              {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+            </span>
+          </p>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={onToggleWatch}
-          className="h-8 w-8 p-0"
+          className="mt-1"
         >
           {isWatched ? (
             <EyeOff className="h-4 w-4" />
@@ -39,17 +47,6 @@ export function WatchlistCard({
           )}
         </Button>
       </div>
-      <div className="mt-2 flex items-center justify-between">
-        <span className="font-mono">${price.toFixed(2)}</span>
-        <span
-          className={`flex items-center gap-1 text-sm ${
-            change >= 0 ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          <TrendingUp className="h-4 w-4" />
-          {change}%
-        </span>
-      </div>
     </Card>
   );
-}
+};

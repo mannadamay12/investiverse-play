@@ -2,8 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import NavigationBar from "./components/ui/navigation-bar";  // Corrected import
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import NavigationBar from "./components/ui/navigation-bar";
 import Home from "./pages/Home";
 import Learn from "./pages/Learn";
 import Invest from "./pages/Invest";
@@ -12,13 +12,15 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { AchievementProvider } from "@/contexts/achievement-context";
 import { SimulationProvider } from "@/contexts/simulation-context";
-import { useEffect, useState } from "react"; // Import useState
+import { useEffect, useState } from "react";
 import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-    const [activeTab, setActiveTab] = useState<string | null>(null); // State for active tab
+// New component to handle layout and routing
+const AppContent = () => {
+    const [activeTab, setActiveTab] = useState<string | null>(null);
+    const location = useLocation();
 
     useEffect(() => {
         const navbar = document.getElementById("navbar");
@@ -28,28 +30,36 @@ const App = () => {
         }
     }, []);
 
+    const showNavbar = location.pathname !== '/';
+
+    return (
+        <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+            <main className={`flex-grow ${showNavbar ? 'pb-20' : ''}`}>
+                <Routes>
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/learn" element={<Learn />} />
+                    <Route path="/invest" element={<Invest />} />
+                    <Route path="/leaderboard" element={<Leaderboard />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/" element={<Landing />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </main>
+            {showNavbar && <NavigationBar activeTab={activeTab} onChangeTab={setActiveTab} />}
+        </div>
+    );
+};
+
+const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <TooltipProvider>
                 <SimulationProvider>
                     <AchievementProvider>
-                        <Toaster />
-                        <Sonner />
                         <BrowserRouter>
-                            <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-                                <main className="flex-grow pb-20"> {/* Adjusted padding bottom */}
-                                    <Routes>
-                                        <Route path="/" element={<Home />} />
-                                        <Route path="/learn" element={<Learn />} />
-                                        <Route path="/invest" element={<Invest />} />
-                                        <Route path="/leaderboard" element={<Leaderboard />} />
-                                        <Route path="/profile" element={<Profile />} />
-                                        <Route path="/landing" element={<Landing />} />
-                                        <Route path="*" element={<NotFound />} />
-                                    </Routes>
-                                </main>
-                                <NavigationBar activeTab={activeTab} onChangeTab={setActiveTab} />
-                            </div>
+                            <Toaster />
+                            <Sonner />
+                            <AppContent />
                         </BrowserRouter>
                     </AchievementProvider>
                 </SimulationProvider>
