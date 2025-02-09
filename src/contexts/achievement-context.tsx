@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Achievement, ACHIEVEMENTS } from "@/types/achievements";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,6 +14,7 @@ interface AchievementContextType {
   awardAchievement: (id: string) => void;
   hasAchievement: (id: string) => boolean;
   getProgress: (id: string) => number;
+  checkAchievement: (type: string, value: number) => void;
 }
 
 export const AchievementContext = React.createContext<AchievementContextType | null>(null);
@@ -35,13 +37,11 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
       totalXp: prev.totalXp + achievement.xp
     }));
 
-    // Show achievement toast
     toast({
       title: `${achievement.icon} Achievement Unlocked!`,
       description: `${achievement.title} - ${achievement.description}`,
     });
 
-    // Trigger confetti
     confetti({
       particleCount: 100,
       spread: 70,
@@ -58,12 +58,22 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     return 0;
   }, []);
 
+  const checkAchievement = React.useCallback((type: string, value: number) => {
+    // Add achievement checking logic here
+    if (type === "lesson_complete") {
+      if (value === 1) awardAchievement("first_lesson");
+      if (value === 5) awardAchievement("learning_streak");
+      if (value === 10) awardAchievement("master_student");
+    }
+  }, [awardAchievement]);
+
   const value = React.useMemo(() => ({
     state,
     awardAchievement,
     hasAchievement,
-    getProgress
-  }), [state, awardAchievement, hasAchievement, getProgress]);
+    getProgress,
+    checkAchievement
+  }), [state, awardAchievement, hasAchievement, getProgress, checkAchievement]);
 
   return (
     <AchievementContext.Provider value={value}>
@@ -79,3 +89,4 @@ export function useAchievement() {
   }
   return context;
 }
+

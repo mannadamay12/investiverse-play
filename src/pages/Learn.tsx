@@ -16,7 +16,7 @@ interface Module {
   title: string;
   description: string;
   progress: number;
-  status: "completed" | "locked";
+  status: "completed" | "locked" | "in-progress";
   lessons: Lesson[];
 }
 
@@ -25,8 +25,8 @@ interface Lesson {
   title: string;
   description: string;
   completed: boolean;
+  locked?: boolean;
   xp: number;
-  quiz?: QuizProps;
 }
 
 // Mock data - in a real app this would come from an API
@@ -86,6 +86,7 @@ const modules: Module[] = [
         id: 6,
         title: "Market Analysis",
         description: "Analyzing the stock market",
+        completed: false,
         locked: true,
         xp: 50,
       },
@@ -102,6 +103,7 @@ const modules: Module[] = [
         id: 7,
         title: "Portfolio Diversification",
         description: "Diversifying your portfolio",
+        completed: false,
         locked: true,
         xp: 100,
       },
@@ -109,6 +111,7 @@ const modules: Module[] = [
         id: 8,
         title: "Technical Analysis",
         description: "Using technical analysis",
+        completed: false,
         locked: true,
         xp: 100,
       },
@@ -116,6 +119,7 @@ const modules: Module[] = [
         id: 9,
         title: "Investment Strategies",
         description: "Advanced investment strategies",
+        completed: false,
         locked: true,
         xp: 100,
       },

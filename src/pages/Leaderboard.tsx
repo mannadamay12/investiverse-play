@@ -12,7 +12,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { generateMockLeaderboardData, getLevelInfo } from "@/lib/leaderboard"
-import { type LeaderboardScope, type LeaderboardTimeframe } from "@/types/leaderboard"
+import { type LeaderboardScope, type LeaderboardTimeframe, type LeaderboardEntry } from "@/types/leaderboard"
 import { cn } from "@/lib/utils"
 
 export default function Leaderboard() {
