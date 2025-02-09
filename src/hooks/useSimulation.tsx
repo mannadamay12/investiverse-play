@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { generateHistoricalData, HistoricalDataPoint } from "@/utils/mockData";
 import { Portfolio } from "@/types";
-
+import stockData from '../assets/dow30_daily_close.json';
 interface SimulationState {
   portfolio: Portfolio[];
   watchlist: string[];
@@ -10,6 +10,14 @@ interface SimulationState {
 }
 
 export const useSimulation = () => {
+  const getHistoricalPrices = (symbol: string) => {
+    return Object.entries(stockData[symbol] || {})
+      .map(([date, price]) => ({
+        date,
+        price
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
   const [state, setState] = useState<SimulationState>({
     portfolio: [],
     watchlist: [],
@@ -22,7 +30,7 @@ export const useSimulation = () => {
     const interval = setInterval(() => {
       setState(prev => ({
         ...prev,
-        historicalData: generateHistoricalData(30, prev.portfolioValue)
+        historicalData: getHistoricalPrices(prev.portfolio[0]?.symbol || 'AAPL')
       }));
     }, 60000); // Update every minute
 

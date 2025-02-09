@@ -1,33 +1,43 @@
-// NavigationBar.jsx
-import { Home, Trophy, BookOpen, ChartLine, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ExpandableTabs } from "@/components/ui/expandable-tabs";
+import { Home, GraduationCap, PiggyBank, Trophy, User } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { useEffect, useMemo } from "react";
 
-const NavigationBar = () => {
-  return (
-    <div id="navbar" className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 py-2 px-4 z-50">
-      <nav className="max-w-screen-xl mx-auto">
-        <ul className="flex justify-around items-center">
-          <NavItem icon={<Home className="w-6 h-6" />} label="Home" to="/" />
-          <NavItem icon={<BookOpen className="w-6 h-6" />} label="Learn" to="/learn" />
-          <NavItem icon={<ChartLine className="w-6 h-6" />} label="Invest" to="/invest" />
-          <NavItem icon={<Trophy className="w-6 h-6" />} label="Leaderboard" to="/leaderboard" />
-          <NavItem icon={<User className="w-6 h-6" />} label="Profile" to="/profile" />
-        </ul>
-      </nav>
-    </div>
-  );
+interface NavigationBarProps {
+    activeTab: string | null;
+    onChangeTab: (tab: string | null) => void;
+}
+
+const NavigationBar = ({ activeTab, onChangeTab }: NavigationBarProps) => {
+    const location = useLocation();
+
+    const tabs = useMemo(() => [
+        { title: "Home", icon: Home, to: "/" },
+        { title: "Learn", icon: GraduationCap, to: "/learn" },
+        { title: "Invest", icon: PiggyBank, to: "/invest" },
+        { title: "Leaderboard", icon: Trophy, to: "/leaderboard" },
+        { title: "Profile", icon: User, to: "/profile" },
+    ], []);
+
+    useEffect(() => {
+        // Find the tab index that matches the current location
+        const currentTabIndex = tabs.findIndex(tab => tab.to === location.pathname);
+        // Update the active tab with the index
+        onChangeTab(currentTabIndex !== -1 ? tabs[currentTabIndex].title : null);
+    }, [location.pathname, onChangeTab, tabs]);
+
+    return (
+        <nav id="navbar" className="fixed bottom-0 left-0 right-0 flex justify-center p-4 pointer-events-none">
+            <div className="pointer-events-auto">
+                <ExpandableTabs
+                    tabs={tabs}
+                    className="backdrop-blur-md bg-background/70 border-none shadow-lg"
+                    activeColor="text-primary"
+                    onChange={(index) => onChangeTab(index !== null ? tabs[index].title : null)}
+                />
+            </div>
+        </nav>
+    );
 };
-
-const NavItem = ({ icon, label, to }: { icon: React.ReactNode; label: string; to: string }) => (
-  <li>
-    <Link
-      to={to}
-      className="flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-primary transition-colors duration-200"
-    >
-      {icon}
-      <span className="text-xs font-medium">{label}</span>
-    </Link>
-  </li>
-);
 
 export default NavigationBar;

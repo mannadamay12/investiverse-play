@@ -1,37 +1,49 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSimulation } from "@/hooks/useSimulation";
 import { useAchievement } from "@/contexts/achievement-context";
-import { useAchievements } from "@/contexts/useAchievements";
-// import { PortfolioChart } from "@/components/invest/PortfolioChart";
+import PortfolioChart from "@/components/invest/PortfolioChart";
 import { QuickInvestCard } from "@/components/invest/QuickInvestCard";
 import { WatchlistCard } from "@/components/invest/WatchlistCard";
 import { PortfolioAnalytics } from "@/components/invest/PortfolioAnalytics";
 import { EducationalTooltip } from "@/components/invest/EducationalTooltip";
-import { ArrowUpRight, ArrowDownRight, Plus, Eye, EyeOff, TrendingUp } from "lucide-react";
+import { Plus, Eye } from "lucide-react";
 import PageContainer from "@/components/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { ChartContainer } from "@/components/ui/chart";
-import {
-  Area,
-  AreaChart,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
-import { HistoricalDataPoint } from "@/utils/mockData";
+import { processStockData, getAvailableSymbols } from '@/utils/stockDataProcessor';
+
+interface MockStockData {
+  name: string;
+  price: number;
+  change: number;
+  tag: string;
+}
 
 const Invest = () => {
   const { state, executeTrade, addToWatchlist, removeFromWatchlist } = useSimulation();
   const { awardAchievement, hasAchievement } = useAchievement();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedSymbol, setSelectedSymbol] = useState('AAPL');
+  const [chartData, setChartData] = useState([]);
   
+  // Initialize mockStockData with proper structure
+  const [mockStockData, setMockStockData] = useState<Record<string, MockStockData>>(() => {
+    const symbols = getAvailableSymbols();
+    return Object.fromEntries(
+      symbols.map(symbol => [
+        symbol,
+        {
+          name: symbol,
+          price: 0,
+          change: 0,
+          tag: 'tech'
+        }
+      ])
+    );
+  });
+
   // Check for achievements
   useEffect(() => {
     if (state.portfolio.length >= 5 && !hasAchievement("diversified_portfolio")) {
@@ -47,6 +59,26 @@ const Invest = () => {
     const timer = setTimeout(() => setIsLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const data = processStockData(selectedSymbol);
+    setChartData(data);
+    
+    // Update mockStockData with latest price
+    if (data.length > 0) {
+      setMockStockData(prev => ({
+        ...prev,
+        [selectedSymbol]: {
+          ...prev[selectedSymbol],
+          price: data[data.length - 1].value,
+          change: ((data[data.length - 1].value - data[0].value) / data[0].value) * 100
+        }
+      }));
+    }
+    
+    setIsLoading(false);
+  }, [selectedSymbol]);
 
   const handleInvest = (symbol: string, amount: number) => {
     const price = mockStockData[symbol]?.price || 0;
@@ -74,7 +106,7 @@ const Invest = () => {
   };
 
   // Add data transformation for the chart if needed
-  const chartData = useMemo(() => {
+  const chartDataMemo = useMemo(() => {
     return state.historicalData.map(point => ({
       ...point,
       value: Math.round(point.value) // Round values for cleaner display
@@ -102,66 +134,24 @@ const Invest = () => {
             </Button>
           </div>
         </div>
-        <div className="h-[300px] sm:h-[400px]">
-          {isLoading ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="animate-pulse">Loading chart...</div>
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={chartData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis 
-                  dataKey="date" 
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fontSize: 12 }}
-                  dy={10}
-                />
-                <YAxis
-                  tickFormatter={formatCurrency}
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fontSize: 12 }}
-                  dx={-10}
-                />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="bg-white p-3 rounded-lg shadow-lg border">
-                          <p className="text-sm text-gray-500">
-                            {payload[0].payload.date}
-                          </p>
-                          <p className="text-lg font-semibold text-primary">
-                            {formatCurrency(payload[0].value as number)}
-                          </p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#8884d8"
-                  fillOpacity={1}
-                  fill="url(#portfolioGradient)"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          )}
+        <div className="mb-6">
+          <select
+            value={selectedSymbol}
+            onChange={(e) => setSelectedSymbol(e.target.value)}
+            className="block w-full max-w-xs px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            {getAvailableSymbols().map((symbol) => (
+              <option key={symbol} value={symbol}>
+                {symbol}
+              </option>
+            ))}
+          </select>
         </div>
+        <PortfolioChart 
+          data={chartData}
+          height="300px"
+          isLoading={isLoading}
+        />
       </Card>
 
       {/* Portfolio Analytics - with loading state */}
@@ -238,14 +228,6 @@ const Invest = () => {
       </div>
     </PageContainer>
   );
-};
-
-// Mock data for stocks
-const mockStockData = {
-  AAPL: { name: "Apple Inc.", price: 150.23, change: 1.2, tag: "Tech Giant" },
-  GOOGL: { name: "Alphabet Inc.", price: 2750.50, change: -0.5, tag: "Tech Leader" },
-  MSFT: { name: "Microsoft Corp.", price: 285.30, change: 0.8, tag: "Stable Growth" },
-  // Add more stocks as needed
 };
 
 export default Invest;

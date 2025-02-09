@@ -1,70 +1,77 @@
-import { Area, AreaChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
+import React from 'react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { StockDataPoint } from '../../utils/stockDataProcessor';
 
 interface PortfolioChartProps {
-  data: Array<{
-    date: string;
-    value: number;
-  }>;
+  data: StockDataPoint[];
+  symbol?: string;
+  height?: string;
+  isLoading?: boolean;
 }
 
-const PortfolioChart: React.FC<PortfolioChartProps> = ({ data }) => {
-  // Calculate min and max for better Y axis display
-  const minValue = Math.floor(Math.min(...data.map(d => d.value)) * 0.95);
-  const maxValue = Math.ceil(Math.max(...data.map(d => d.value)) * 1.05);
+const PortfolioChart: React.FC<PortfolioChartProps> = ({ 
+  data, 
+  symbol, 
+  height = "400px",
+  isLoading = false 
+}) => {
+  if (isLoading) {
+    return (
+      <div className={`h-[${height}] flex items-center justify-center`}>
+        <div className="animate-pulse">Loading chart...</div>
+      </div>
+    );
+  }
 
-  const chartConfig = {
-    value: {
-      label: "Portfolio Value",
-      theme: {
-        light: "hsl(var(--primary))",
-        dark: "hsl(var(--primary))"
-      }
-    }
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   return (
-    <div className="h-[200px] w-full">
-      <ChartContainer
-        data={data}
-        config={chartConfig}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <XAxis
-              dataKey="date"
-              tickFormatter={(value) => new Date(value).toLocaleDateString()}
-              fontSize={12}
-              tickMargin={10}
-            />
-            <YAxis
-              domain={[minValue, maxValue]}
-              tickFormatter={(value) => `$${(value/1000).toFixed(1)}k`}
-              fontSize={12}
-              width={60}
-            />
-            <Tooltip
-              formatter={(value: number) => [`$${value.toLocaleString()}`, "Portfolio Value"]}
-              labelFormatter={(label) => new Date(label).toLocaleDateString()}
-            />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              fillOpacity={1}
-              fill="url(#colorValue)"
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </ChartContainer>
+    <div className={`h-[${height}] w-full`}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={data}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis 
+            dataKey="date" 
+            tickFormatter={formatDate}
+          />
+          <YAxis 
+            tickFormatter={formatCurrency}
+            domain={['auto', 'auto']}
+          />
+          <Tooltip 
+            formatter={(value: number) => formatCurrency(value)}
+            labelFormatter={(label) => formatDate(label as string)}
+          />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke="#8884d8"
+            activeDot={{ r: 8 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 };

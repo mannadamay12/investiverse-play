@@ -5,7 +5,7 @@ import { EducationalTooltip } from "./EducationalTooltip";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Separator } from "@/components/ui/separator";
 import { AlertCircle, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
-
+import stockData from '@/assets/dow30_daily_close.json';
 interface PortfolioHolding {
   symbol: string;
   shares: number;
@@ -31,13 +31,22 @@ interface ProcessedHolding {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export function PortfolioAnalytics({ portfolio }: PortfolioAnalyticsProps) {
+  const getLatestPrice = (symbol: string) => {
+    const prices = stockData[symbol];
+    if (!prices) return 0;
+    const dates = Object.keys(prices).sort().reverse();
+    return prices[dates[0]] || 0;
+  };
+
   const totalValue = portfolio.reduce(
     (acc, holding) => acc + holding.shares * holding.lastPrice,
     0
   );
 
   const holdings = portfolio.map(holding => {
-    const value = holding.shares * holding.lastPrice;
+    const currentPrice = getLatestPrice(holding.symbol);
+    const value = holding.shares * currentPrice;
+    // const value = holding.shares * holding.lastPrice;
     const costBasis = holding.shares * holding.averagePrice;
     const profit = value - costBasis;
     const profitPercentage = ((value - costBasis) / costBasis) * 100;
@@ -90,9 +99,13 @@ export function PortfolioAnalytics({ portfolio }: PortfolioAnalyticsProps) {
           </div>
 
           <div>
-            <EducationalTooltip topic="diversification">
-              <h3 className="text-lg font-semibold mb-4">Asset Allocation</h3>
-            </EducationalTooltip>
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-lg font-semibold">Asset Allocation</h3>
+              <EducationalTooltip topic="diversification">
+                <span className="sr-only">Learn more about asset allocation</span>
+              </EducationalTooltip>
+            </div>
+            
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
