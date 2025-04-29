@@ -23,7 +23,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
 
     try {
       const response = await fetch(
-        `https://fastapi-project-production-fc1c.up.railway.app/${mode}`,
+        `http://0.0.0.0:8000/${mode}`,
         {
           method: "POST",
           headers: {
