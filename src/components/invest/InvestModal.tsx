@@ -38,7 +38,7 @@ export const InvestModal = ({
   const [shares, setShares] = useState("");
 
   const handleInvest = () => {
-    const investAmount = orderType === "amount" ? Number(amount) : Number(shares) * currentPrice;
+    const investAmount = orderType === "amount" ? Number(amount) : Number(shares);
     if (investAmount > 0) {
       onInvest(investAmount, orderType);
       onClose();

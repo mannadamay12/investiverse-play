@@ -16,6 +16,9 @@ import { EnhancedStockData, StockData, StockDataPoint } from '@/types/stock';
 import stockData from '@/assets/dow30_daily_close.json';
 import { InvestModal } from "@/components/invest/InvestModal";
 import { PageChat } from "@/components/shared/PageChat";
+import { useUser } from "@/contexts/UserContext";
+import { submitTrade } from "@/lib/api";
+import { TradeRequest } from "@/types/trade";
 
 interface stockData {
   name: string;
@@ -25,6 +28,7 @@ interface stockData {
 }
 
 const Invest = () => {
+  const { userId } = useUser();
   const { state, executeTrade, addToWatchlist, removeFromWatchlist } = useSimulation();
   const { awardAchievement, hasAchievement } = useAchievement();
   const { toast } = useToast();
@@ -60,20 +64,46 @@ const Invest = () => {
     return () => clearTimeout(timer);
   }, [selectedSymbol]);
 
-  const handleInvest = (symbol: string, amount: number) => {
+  const handleInvest = async (symbol: string, amount: number) => {
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to invest",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const stockInfo = stocksData[symbol];
     if (!stockInfo) return;
+    //FIXME: Handle order type in the modal
+    const shares = amount //Temporary fix since we are not handling the order type in the modal
 
-    const shares = amount / stockInfo.price;
-    
-    executeTrade(symbol, shares, stockInfo.price);
-    toast({
-      title: "Investment Successful!",
-      description: `You invested $${amount} in ${stockInfo.name}`,
-    });
-    
-    if (state.portfolio.length === 0) {
-      awardAchievement("first_investment");
+    try {
+      const tradeData: TradeRequest = {
+        user_id: userId,
+        stock_name: symbol,
+        trade_type: "BUY",
+        quantity: shares, // ensure this conforms to your backend expectations
+        price: stockInfo.price,
+      };
+
+      await submitTrade(tradeData);
+
+      toast({
+        title: "Investment Successful!",
+        description: `You invested $${amount} in ${stockInfo.name}`,
+      });
+
+      if (state.portfolio.length === 0) {
+        awardAchievement("first_investment");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: `Failed to invest: ${error.message}`,
+        variant: "destructive",
+      });
     }
   };
 

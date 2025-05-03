@@ -2,7 +2,7 @@ import { TradeRequest, TradeResponse } from "@/types/trade";
 
 export async function submitTrade(tradeData: TradeRequest): Promise<TradeResponse> {
   try {
-    const response = await fetch('https://fastapi-project-production-fc1c.up.railway.app/trades/add', {
+    const response = await fetch('http://0.0.0.0:8000/trades/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -22,5 +22,25 @@ export async function submitTrade(tradeData: TradeRequest): Promise<TradeRespons
   } catch (error) {
     console.error('Error submitting trade:', error);
     throw new Error('Failed to submit trade');
+  }
+}
+
+export async function fetchPortfolio(userId: string): Promise<any> {
+  try {
+    const response = await fetch(`http://0.0.0.0:8000/portfolio/${userId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Portfolio not found");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching portfolio:", error);
+    throw new Error("Failed to fetch portfolio");
   }
 }

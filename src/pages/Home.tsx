@@ -1,16 +1,36 @@
+import { useEffect, useState } from "react";
 import { Trophy, TrendingUp, BookOpen, Award, Sparkles } from "lucide-react";
 import PageContainer from "@/components/ui/page-container";
 import { NextLessonCard } from "@/components/home/next-lesson-card";
 import { MiniChart } from "@/components/ui/mini-chart";
 import { PageChat } from "@/components/shared/PageChat";
+import { useUser } from "@/contexts/UserContext";
+import { fetchPortfolio } from "@/lib/api";
 
 const Home = () => {
+  const { userId } = useUser();
+  const [portfolioValue, setPortfolioValue] = useState(0.0);
+
   // Sample data for the mini chart
   const chartData = Array.from({ length: 7 }, (_, i) => ({
     date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toISOString(),
     value: 1000 + Math.random() * 500,
   }));
 
+  useEffect(() => {
+    if (!userId) return; // If there's no user, skip fetching
+  
+    (async () => {
+      try {
+        const data = await fetchPortfolio(userId);
+        // Assuming the endpoint returns a JSON object with a "current_value" property
+        setPortfolioValue(data.current_value ?? 0.0);
+      } catch (err) {
+        // If the user_id doesn't exist in the portfolio table, show $0.0
+        setPortfolioValue(0.0);
+      }
+    })();
+  }, [userId]);
   return (
     <>
       <PageContainer className="space-y-6">
@@ -28,7 +48,7 @@ const Home = () => {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white/80 backdrop-blur p-4 rounded-xl border border-gray-200 shadow-sm">
             <div className="text-primary font-semibold">Portfolio Value</div>
-            <div className="text-2xl font-bold">$1,234.56</div>
+            <div className="text-2xl font-bold">${portfolioValue.toFixed(2)}</div>
             <div className="text-success text-sm">+2.4% today</div>
             <MiniChart data={chartData} className="text-success mt-2" />
           </div>
