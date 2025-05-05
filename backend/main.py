@@ -217,7 +217,7 @@ def get_portfolio(user_id: str):
 
 # Update the Groq client initialization with proper headers
 groq_client = Groq(
-    api_key="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",
+    api_key="<>",
 )
 processor = PortfolioDataProcessor()
 def generate_financial_advice(user_id: str, user_question: str):
