@@ -44,3 +44,28 @@ export async function fetchPortfolio(userId: string): Promise<any> {
     throw new Error("Failed to fetch portfolio");
   }
 }
+
+/**
+ * Fetches financial advice for a user based on their question.
+ */
+export async function fetchAdvice(userId: string, question: string): Promise<{ response: string }> {
+  try {
+    const resp = await fetch(`http://0.0.0.0:8000/advice/${userId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ question })
+    });
+
+    if (!resp.ok) {
+      throw new Error('Failed to fetch advice');
+    }
+
+    const data = await resp.json();
+    return data as { response: string };
+  } catch (error) {
+    console.error('Error fetching advice:', error);
+    throw error;
+  }
+}

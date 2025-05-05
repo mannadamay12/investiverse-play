@@ -8,6 +8,8 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 import json
 from supabase import create_client, Client
+from spark_session import PortfolioDataProcessor
+import asyncio
 
 SUPABASE_URL = "https://tfmbjbskzindivtnxtrf.supabase.co"
 SUPABASE_KEY = "<>"
@@ -213,71 +215,80 @@ def get_portfolio(user_id: str):
     print(response.data)
     return response.data  # Return the fetched portfolio data
 
-groq_client = Groq(api_key="<>")
-
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-predefined_intents = [
-    "Should I diversify my portfolio?",
-    "Is my portfolio suited for long-term?",
-    "Which stocks should I add more to given the current trend?",
-    "what are some factors I should look out for while investing a stock",
-    "how to identify stocks for investing",
-    "Should I sell any of the stocks in my portfolio",
-    "Classify my portfolio into smallcap, midcap and largecap stocks",
-]
-intent_embeddings = [embedding_model.encode(q) for q in predefined_intents]
-
-# ✅ Fix: Ensure function uses `predefined_intents`
-def find_most_similar_question(user_query: str, threshold=0.7):
-    """Finds the predefined question closest to the user's query using similarity matching."""
-    user_embedding = embedding_model.encode(user_query)
-
-    similarities = [
-        np.dot(user_embedding, q_emb) / (np.linalg.norm(user_embedding) * np.linalg.norm(q_emb))
-        for q_emb in intent_embeddings
-    ]
-
-    best_match_idx = np.argmax(similarities)
-    best_score = similarities[best_match_idx]
-
-    return predefined_intents[best_match_idx] if best_score >= threshold else None
-
+# Update the Groq client initialization with proper headers
+groq_client = Groq(
+    api_key="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",
+)
+processor = PortfolioDataProcessor()
 def generate_financial_advice(user_id: str, user_question: str):
-    """Fetches portfolio data and generates AI-based financial advice via Groq API."""
+    """Enhanced RAG implementation using Spark analytics and portfolio data."""
 
-    # 1️⃣ Match User Query to a Predefined Question
-    matched_question = find_most_similar_question(user_question)
-    if not matched_question:
-        return {"response": "I'm not sure how to answer that. Can you rephrase?"}
+    # 2. Fetch Portfolio and Trade Data
+    portfolio = supabase.from_("portfolio").select("*").eq("user_id", user_id).single().execute()
+    trades = supabase.from_("trades").select("*").eq("user_id", user_id).execute()
 
-    # 2️⃣ Fetch Portfolio Data from Supabase
-    response = supabase.from_("portfolio").select("*").eq("user_id", user_id).single().execute()
-    if response.data is None:
+    if portfolio.data is None:
         raise HTTPException(status_code=404, detail="No portfolio data found for this user.")
 
-    portfolio_data = response.data
-    portfolio_string = json.dumps(portfolio_data, indent=4)
-    print(type(portfolio_string))
-    # 3️⃣ Generate AI Response Using Groq API
-    prompt = f"""
-    You are an advanced financial advisor. The user's portfolio details are:
-    {portfolio_string}. The user asked: "{matched_question}". Provide a clear, insightful, and actionable response.
-    """
+    # 3. Process Data using Spark
+    try:
+        analytics = processor.process_portfolio_data(portfolio.data, trades.data)
+        
+        system_prompt = """
+            You are a helpful AI assistant integrated into InvestiVerse. Format your reply in HTML
+            (<p>, <ul>, <li>, <strong>, etc.), keep a friendly, educational tone, and reference 
+            the user's real portfolio metrics.
+                """.strip()
 
-    chat_completion = groq_client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        model="llama-3.3-70b-versatile",
-    )
-    print(chat_completion.choices[0].message.content)
-    return {"response": chat_completion.choices[0].message.content}
+        # 4. Create Enhanced Context with Analytics
+        context = {
+            "overview": {
+                "current_value": portfolio.data.get("current_value", 0),
+                "invested_value": portfolio.data.get("invested_value", 0)
+            },
+            "stock_metrics":           analytics["stock_metrics"],
+            "trading_patterns":        analytics["trading_patterns"],
+            "portfolio_concentration": analytics["portfolio_concentration"],
+            "performance":             analytics["performance"],
+        }
+
+        user_message = (
+            f"User Question: {user_question}\n\n"
+            f"Data Context:\n{json.dumps(context, indent=2)}"
+        )
+
+
+        # 5. Generate AI Response Using Groq
+        completion = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_message}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        return {"response": completion.choices[0].message.content}
+
+    except Exception as e:
+        print(f"Error in generate_financial_advice: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error generating financial advice")
+
+# Update the endpoint to use the enhanced RAG
 @app.post("/advice/{user_id}")
-def get_financial_advice(user_id: str, query: dict):
+async def get_financial_advice(user_id: str, query: dict):
     user_question = query.get("question")
-
     if not user_question:
         raise HTTPException(status_code=400, detail="Question not provided.")
-
-    return generate_financial_advice(user_id, user_question)
+    # offload the blocking “generate” function
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(
+        None,
+        generate_financial_advice,
+        user_id,
+        user_question
+    )
 
 @app.get("/")
 def read_root():

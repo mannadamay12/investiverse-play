@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/chat-bubble";
 import DOMPurify from "dompurify";
 import { useUser } from "@/contexts/UserContext";
+import { fetchAdvice } from "@/lib/api";
 
 interface Message {
   content: string;
@@ -28,6 +29,7 @@ export function PageChat() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
+    if (isLoading) return;
     if (!inputMessage.trim()) return;
     if (!userId) {
       setMessages((prev) => [
@@ -36,63 +38,29 @@ export function PageChat() {
       ]);
       return;
     }
+
+    // Add the user's message to the chat
     setMessages((prev) => [...prev, { content: inputMessage, type: "sent" }]);
     setInputMessage("");
+    setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer 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`,
-          'Cookie': '__cf_bm=OiYdqdxdC1F2sVGQSoll6MKDfjzyLVVe4L0qH3.s0xs-1739088058-1.0.1.1-dvrD6LIOyaHl0YtmzVemdx4ea6qSalgKWMd6z5f7BffBUY2gB_GNRXdALXsN59KJRPg2DADtw8_BIwtoeeDUjQ'
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            {
-              role: "system",
-              content: `
-                You are a helpful AI assistant integrated into the “InvestiVerse” app — a platform focusing on micro-investing, financial education, and gamified lessons. Your goal is to provide interactive, engaging, and informative responses about personal finance, investing strategies, and how users can get the most out of InvestiVerse.
-
-                When you respond, please:
-                - Use valid HTML, with tags such as <strong>, <ul>, <li>, <p>, etc. for formatting and emphasis.
-                - Provide clear, concise information while keeping an approachable, friendly tone.
-                - Reference features or sections of the InvestiVerse app where relevant (e.g., lessons, quizzes, investment hub, leaderboard).
-                - Encourage users to learn more through InvestiVerse’s educational modules or features, but avoid over-promising or giving overly specific financial advice.
-                - Maintain a respectful, helpful style that caters to both beginners and intermediate investors.
-
-                Remember:
-                - You are not a financial advisor. Offer information and examples but do not provide personalized financial advice.
-                - Use <strong> tags to emphasize key points. Utilize lists (<ul>, <li>) and short paragraphs for clarity.
-                - Keep the conversation interactive: ask follow-up questions or prompt users to explore relevant InvestiVerse features.
-
-                In summary, be an engaging, enthusiastic guide that reflects InvestiVerse’s commitment to fun, accessible, and responsible investing education. Return all answers in valid HTML.
-              `
-            },
-            {
-              role: "user",
-              content: inputMessage
-            }
-          ]
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch AI response');
-      }
-
-      const data = await response.json();
-      const aiMessage = data.choices?.[0]?.message?.content || "No response";
-      // Sanitize the AI response using DOMPurify
+      // Fetch the AI-generated advice via your API helper
+      const { response: aiMessage } = await fetchAdvice(userId, inputMessage);
+      // Sanitize before displaying
       const sanitizedMessage = DOMPurify.sanitize(aiMessage);
-
-      setMessages(prev => [...prev, { content: sanitizedMessage, type: "received" }]);
+      setMessages((prev) => [...prev, { content: sanitizedMessage, type: "received" }]);
     } catch (error) {
-      console.error('Error fetching AI response:', error);
-      setMessages(prev => [...prev, { content: 'Error fetching AI response', type: "received" }]);
+      console.error("Error fetching AI response:", error);
+      setMessages((prev) => [
+        ...prev,
+        { content: "Error fetching AI response", type: "received" },
+      ]);
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   return (
     <ExpandableChat>
@@ -115,6 +83,18 @@ export function PageChat() {
             </ChatBubbleMessage>
           </ChatBubble>
         ))}
+        {isLoading && (
+          <ChatBubble variant="received">
+            <ChatBubbleAvatar />
+            <ChatBubbleMessage variant="received">
+              <div className="flex gap-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.15s" }}></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.3s" }}></span>
+              </div>
+            </ChatBubbleMessage>
+          </ChatBubble>
+        )}
       </ExpandableChatBody>
 
       <ExpandableChatFooter>
@@ -129,6 +109,7 @@ export function PageChat() {
                 handleSend();
               }
             }}
+            disabled={isLoading}
           />
           <Button size="icon" onClick={handleSend}>
             <Send className="h-4 w-4" />
