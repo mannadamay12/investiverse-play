@@ -129,3 +129,5 @@ websockets==14.2
 Werkzeug==2.0.3
 wsproto==1.2.0
 yarl==1.17.1
+schedule
+pyspark

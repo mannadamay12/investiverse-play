@@ -12,7 +12,7 @@ from spark_session import PortfolioDataProcessor
 import asyncio
 
 SUPABASE_URL = "https://tfmbjbskzindivtnxtrf.supabase.co"
-SUPABASE_KEY = "<>"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmbWJqYnNremluZGl2dG54dHJmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTA0NzgyOCwiZXhwIjoyMDU0NjIzODI4fQ.kmTKVQj8HomFUP5stjGlsPPHNGlcZMuNNB6mvvq5JbA"
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = FastAPI()
@@ -297,6 +297,10 @@ def read_root():
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
 
+@app.get("/api/leaderboard")
+def get_leaderboard():
+    response = supabase.table("leaderboard").select("*").order("rank", desc=False).limit(50).execute()
+    return response.data
 
 # test_user = UserSignup(email="anitej5@gmail.com", password="SecurePass123!")
 # test_trade = Trade(user_id="73261abe-21e4-4969-9bc1-e270fb1feabb", stock_name="AAPL", trade_type="BUY", quantity=5, price=50.0)

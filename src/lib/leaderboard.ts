@@ -1,4 +1,4 @@
-import { type LeaderboardEntry, type LeaderboardScope, type LeaderboardTimeframe } from "@/types/leaderboard"
+import { type LeaderboardEntry } from "@/types/leaderboard"
 
 export const LEVEL_COLORS = {
   bronze: "text-amber-600",
@@ -16,36 +16,27 @@ export function getLevelInfo(xp: number) {
   return { name: "Bronze", color: LEVEL_COLORS.bronze }
 }
 
-export function generateMockLeaderboardData(
-  scope: LeaderboardScope,
-  timeframe: LeaderboardTimeframe
-): LeaderboardEntry[] {
-  // Mock data generation
-  return Array.from({ length: 100 }, (_, i) => ({
-    id: `user-${i + 1}`,
-    name: `${scope === 'friends' ? 'Friend' : 'Player'} ${i + 1}`,
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=Player${i + 1}`,
-    position: i + 1,
-    xp: Math.round((10000 - i * 50) * (timeframe === 'daily' ? 0.1 : timeframe === 'weekly' ? 0.5 : 1)),
-    level: getLevelInfo(10000 - i * 50),
-    streak: Math.floor(Math.random() * 10),
-    recentAchievement: Math.random() > 0.7 ? "New Portfolio Milestone!" : undefined,
+// ✅ Real API fetch with correct mapping
+export async function fetchLeaderboardData(): Promise<LeaderboardEntry[]> {
+  const res = await fetch("http://localhost:8000/api/leaderboard")
+  if (!res.ok) throw new Error("Failed to fetch leaderboard")
+
+  const data = await res.json()
+
+  return data.map((entry: any) => ({
+    id: entry.id,
+    name: entry.name,
+    avatar: entry.avatar,
+    position: entry.position,
+    xp: entry.xp,
+    level: getLevelInfo(entry.xp),
+    streak: entry.streak ?? 0,
+    recentAchievement: entry.recentachievement ?? undefined,
     xpBreakdown: {
-      quizzes: 35,
-      investing: 40,
-      challenges: 25,
+      quizzes: 0,       // Default values; update if backend provides actual data
+      investing: 0,
+      challenges: 0
     },
-    badges: [
-      {
-        id: "quick-learner",
-        name: "Quick Learner",
-        icon: "📚"
-      },
-      {
-        id: "investment-guru",
-        name: "Investment Guru",
-        icon: "📈"
-      }
-    ]
+    badges: []          // Default empty; update if backend provides badges
   }))
 }
