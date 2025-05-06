@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi import Query
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -10,6 +11,9 @@ import json
 from supabase import create_client, Client
 from spark_session import PortfolioDataProcessor
 import asyncio
+from influxdb_client import InfluxDBClient
+from influxdb_client.client.query_api import QueryApi
+
 
 SUPABASE_URL = "https://tfmbjbskzindivtnxtrf.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmbWJqYnNremluZGl2dG54dHJmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTA0NzgyOCwiZXhwIjoyMDU0NjIzODI4fQ.kmTKVQj8HomFUP5stjGlsPPHNGlcZMuNNB6mvvq5JbA"
@@ -301,6 +305,51 @@ if __name__ == "__main__":
 def get_leaderboard():
     response = supabase.table("leaderboard").select("*").order("rank", desc=False).limit(50).execute()
     return response.data
+
+INFLUX_URL = "http://localhost:8086"
+INFLUXDB_TOKEN = "JXFFBPt8sKohODcwH0gx6iL0nxo0B6uoEfOf1hj49YbnSfuajSUpiuAjjEJ1biPircRiZnZZblqs1Eg9hJyCKg=="
+INFLUXDB_ORG = "interverse"
+BUCKET = "stocks"
+
+influx_client = InfluxDBClient(url=INFLUX_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
+query_api: QueryApi = influx_client.query_api()
+
+# -------------------------------
+# GET /api/stock-history
+# -------------------------------
+@app.get("/api/stock-history")
+async def stock_history(symbol: str = Query(...), range_key: str = Query("20m")):
+    range_map = {
+        "1s": "-10s", "1m": "-5m", "1h": "-1h", "1week": "-7d"
+    }
+    window_map = {
+        "1s": "1s", "1m": "10s", "1h": "1m", "1week": "5m"
+    }
+
+    flux_query = f'''
+      from(bucket: "{BUCKET}")
+        |> range(start: {range_map.get(range_key, '-20m')})
+        |> filter(fn: (r) => r._measurement == "stock_price")
+        |> filter(fn: (r) => r._field == "price")
+        |> filter(fn: (r) => r.symbol == "{symbol}")
+        |> aggregateWindow(every: {window_map.get(range_key, '10s')}, fn: mean, createEmpty: true)
+        |> yield(name: "mean")
+    '''
+
+    try:
+        tables = query_api.query(flux_query)
+        results = []
+        for table in tables:
+            for record in table.records:
+                results.append({
+                    "date": record.get_time().isoformat(),
+                    "value": record.get_value(),
+                    "symbol": record.values.get("symbol")
+                })
+        return results
+    except Exception as e:
+        print("******* InfluxDB query failed: *******", e)
+        raise HTTPException(status_code=500, detail="InfluxDB query failed")
 
 # test_user = UserSignup(email="anitej5@gmail.com", password="SecurePass123!")
 # test_trade = Trade(user_id="73261abe-21e4-4969-9bc1-e270fb1feabb", stock_name="AAPL", trade_type="BUY", quantity=5, price=50.0)

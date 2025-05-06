@@ -1,75 +1,69 @@
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { LineChart, Line, ResponsiveContainer } from "recharts";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 interface QuickInvestCardProps {
   symbol: string;
   name: string;
-  price: number;
+  price?: number;
   change: number;
   tag?: string;
   onInvest: (amount: number) => void;
+  priceHistory?: { date: string; value: number }[];
 }
 
-export function QuickInvestCard({ 
-  symbol, 
-  name, 
-  price, 
+export const QuickInvestCard: React.FC<QuickInvestCardProps> = ({
+  symbol,
+  name,
+  price,
   change,
   tag,
-  onInvest 
-}: QuickInvestCardProps) {
-  const isUp = change >= 0;
-  const changeLabel = isUp ? 'up' : 'down';
-  const changeColor = isUp ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600';
+  onInvest,
+  priceHistory = [],
+}) => {
+  const priceColor = change >= 0 ? "text-green-600" : "text-red-600";
+  const Icon = change >= 0 ? ArrowUpRight : ArrowDownRight;
+
+  const formattedPrice = price !== undefined ? `$${price.toFixed(2)}` : "Loading...";
 
   return (
-    <Card className="p-4">
-      <div className="flex justify-between items-start mb-2">
+    <Card className="p-4 flex flex-col justify-between space-y-2">
+      <div className="flex justify-between items-center">
         <div>
-          <div className="font-semibold">{symbol}</div>
-          <div className="text-sm text-muted-foreground">{name}</div>
+          <h4 className="font-semibold text-lg">{symbol}</h4>
+          <p className="text-sm text-gray-500">{name}</p>
         </div>
-        {tag && (
-          <Badge 
-            className={`${changeColor} text-white`}
-          >
-            {changeLabel}
-          </Badge>
-        )}
-      </div>
-      <div className="flex justify-between items-center mb-3">
-        <div className="font-mono font-medium">${price.toFixed(2)}</div>
-        <div className={`flex items-center text-sm ${
-          isUp ? 'text-green-600' : 'text-red-600'
-        }`}>
-          {isUp ? (
-            <ArrowUpRight className="w-4 h-4" />
-          ) : (
-            <ArrowDownRight className="w-4 h-4" />
+        <div className="text-right">
+          <p className="text-md font-mono">{formattedPrice}</p>
+          {price !== undefined && (
+            <span className={`text-xs flex items-center justify-end ${priceColor}`}>
+              <Icon className="w-3 h-3 mr-1" />
+              {change}%
+            </span>
           )}
-          {Math.abs(change)}%
         </div>
       </div>
-      <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex-1"
-          onClick={() => onInvest(5)}
-        >
-          Buy $5
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex-1"
-          onClick={() => onInvest(10)}
-        >
-          Buy $10
-        </Button>
-      </div>
+
+      {priceHistory.length > 0 && (
+        <div className="h-16">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={priceHistory}>
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={change >= 0 ? "#16a34a" : "#dc2626"}
+                dot={false}
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      <Button size="sm" className="mt-2" onClick={() => onInvest(100)}>
+        Invest $100
+      </Button>
     </Card>
   );
-}
+};

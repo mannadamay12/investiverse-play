@@ -131,3 +131,6 @@ wsproto==1.2.0
 yarl==1.17.1
 schedule
 pyspark
+asyncio
+influxdb-client
+
