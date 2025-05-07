@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSimulation } from "@/hooks/useSimulation";
 import { useAchievement } from "@/contexts/achievement-context";
 import { PortfolioChart } from "@/components/invest/PortfolioChart";
 import { QuickInvestCard } from "@/components/invest/QuickInvestCard";
 import { WatchlistCard } from "@/components/invest/WatchlistCard";
-import { PortfolioAnalytics } from "@/components/invest/PortfolioAnalytics";
 import { EducationalTooltip } from "@/components/invest/EducationalTooltip";
 import { Plus, Eye } from "lucide-react";
 import PageContainer from "@/components/ui/page-container";
@@ -14,11 +13,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { InvestModal } from "@/components/invest/InvestModal";
 import { PageChat } from "@/components/shared/PageChat";
 import { useUser } from "@/contexts/UserContext";
-import { submitTrade } from "@/lib/api";
-import { TradeRequest } from "@/types/trade";
 import { useInfluxStockData } from "@/hooks/useInfluxStockData";
 
 const symbols = ["AAPL", "GOOGL", "TSLA"];
+
+const getLatestValue = (data: any[]): number | undefined => {
+  const last = data?.at(-1)?.value;
+  return typeof last === "number" && last > 0 ? last : undefined;
+};
 
 const Invest = () => {
   const { userId } = useUser();
@@ -28,41 +30,102 @@ const Invest = () => {
 
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
   const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
+  const [tradeType, setTradeType] = useState<"BUY" | "SELL">("BUY");
+  const [portfolioStocks, setPortfolioStocks] = useState<Record<string, number>>({});
 
-  // Individual hook calls to follow React rules
+  // Fetch portfolio
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      if (!userId) return;
+      try {
+        const res = await fetch(`http://localhost:8000/portfolio/${userId}`);
+        const data = await res.json();
+        setPortfolioStocks(data.stocks || {});
+      } catch (err) {
+        console.error("Failed to fetch portfolio", err);
+      }
+    };
+    fetchPortfolio();
+  }, [userId]);
+
+  // Live stock data
   const aapl = useInfluxStockData("AAPL");
   const googl = useInfluxStockData("GOOGL");
   const tsla = useInfluxStockData("TSLA");
 
-  const livePrices: Record<string, number> = {
-    AAPL: aapl.data.at(-1)?.value ?? 0,
-    GOOGL: googl.data.at(-1)?.value ?? 0,
-    TSLA: tsla.data.at(-1)?.value ?? 0,
+  const livePrices: Record<string, number | undefined> = {
+    AAPL: getLatestValue(aapl.data),
+    GOOGL: getLatestValue(googl.data),
+    TSLA: getLatestValue(tsla.data),
   };
 
-  const selectedChart = useInfluxStockData(selectedSymbol);
-  const chartData = Array.isArray(selectedChart.data) ? selectedChart.data : [];
-  const isChartLoading = selectedChart.loading;
+  const chartData = {
+    AAPL: aapl.data,
+    GOOGL: googl.data,
+    TSLA: tsla.data,
+  };
 
-  const handleInvest = async (symbol: string, amount: number) => {
+  const selectedChartData = chartData[selectedSymbol] || [];
+  const isChartLoading =
+    selectedSymbol === "AAPL" ? aapl.loading :
+    selectedSymbol === "GOOGL" ? googl.loading :
+    tsla.loading;
+
+  const handleTrade = async (symbol: string, amount: number, type: "BUY" | "SELL") => {
     const price = livePrices[symbol];
-    if (!userId || !price) return;
+
+    if (!userId || !price || isNaN(price) || amount <= 0) {
+      toast({
+        title: "Invalid Trade",
+        description: "Price or amount is invalid.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const quantity = parseFloat((amount / price).toFixed(6));
+    const tradeData = {
+      user_id: String(userId),
+      stock_name: symbol,
+      trade_type: type.toUpperCase(),
+      quantity,
+      price: parseFloat(price.toFixed(2)),
+    };
+
+    console.log("✅ Submitting trade:", tradeData);
 
     try {
-      const tradeData: TradeRequest = {
-        user_id: userId,
-        stock_name: symbol,
-        trade_type: "BUY",
-        quantity: amount,
-        price,
-      };
+      const res = await fetch("http://localhost:8000/trades/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(tradeData),
+      });
 
-      await submitTrade(tradeData);
-      toast({ title: "Investment Successful", description: `You invested $${amount} in ${symbol}` });
+      const json = await res.json();
 
-      if (state.portfolio.length === 0) awardAchievement("first_investment");
+      if (!res.ok) {
+        console.error("❌ Trade failed:", json);
+        throw new Error(json.detail || "Trade submission failed");
+      }
+
+      toast({
+        title: `${type === "BUY" ? "Investment" : "Sale"} Successful`,
+        description: `${type === "BUY" ? "Bought" : "Sold"} $${amount.toFixed(2)} of ${symbol}`
+      });
+
+      awardAchievement("first_investment");
+
+      const updated = await fetch(`http://localhost:8000/portfolio/${userId}`);
+      const data = await updated.json();
+      setPortfolioStocks(data.stocks || {});
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({
+        title: "Trade Error",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   };
 
@@ -75,6 +138,17 @@ const Invest = () => {
       toast({ title: "Added to Watchlist", description: `${symbol} added.` });
     }
   };
+
+  const holdingsValue = Object.entries(portfolioStocks)
+    .filter(([_, shares]) => shares > 0)
+    .map(([symbol, shares]) => {
+      const price = livePrices[symbol] ?? 0;
+      return {
+        symbol,
+        shares,
+        value: shares * price,
+      };
+    });
 
   return (
     <PageContainer className="space-y-6 px-4 sm:px-6 py-6">
@@ -95,8 +169,17 @@ const Invest = () => {
               <Eye className="w-4 h-4 mr-2" />
               {state.watchlist.includes(selectedSymbol) ? "Watching" : "Watch"}
             </Button>
-            <Button size="sm" onClick={() => setIsInvestModalOpen(true)}>
+            <Button size="sm" onClick={() => {
+              setTradeType("BUY");
+              setIsInvestModalOpen(true);
+            }}>
               <Plus className="w-4 h-4 mr-2" /> Invest Now
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => {
+              setTradeType("SELL");
+              setIsInvestModalOpen(true);
+            }}>
+              Sell Now
             </Button>
           </div>
         </div>
@@ -112,26 +195,35 @@ const Invest = () => {
         </select>
 
         <PortfolioChart
-          data={chartData}
+          data={selectedChartData}
           symbol={selectedSymbol}
           isLoading={isChartLoading}
           height="400px"
         />
       </Card>
 
+      <Card className="p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-4">Your Holdings (Live Value)</h2>
+        {holdingsValue.length === 0 ? (
+          <p className="text-sm text-muted-foreground">You don't hold any stocks yet.</p>
+        ) : (
+          holdingsValue.map((entry) => (
+            <div key={entry.symbol} className="flex justify-between text-sm border-b py-2">
+              <span>{entry.symbol} — {entry.shares.toFixed(1)} shares</span>
+              <span>${entry.value.toFixed(2)}</span>
+            </div>
+          ))
+        )}
+      </Card>
+
       <InvestModal
         isOpen={isInvestModalOpen}
         onClose={() => setIsInvestModalOpen(false)}
-        onInvest={(amt, _) => handleInvest(selectedSymbol, amt)}
+        onInvest={(amount) => handleTrade(selectedSymbol, amount, tradeType)}
         symbol={selectedSymbol}
         currentPrice={livePrices[selectedSymbol]}
+        tradeType={tradeType}
       />
-
-      {state.portfolio.length > 0 && (
-        <div className="transition-all">
-          <PortfolioAnalytics portfolio={state.portfolio} />
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <div className="space-y-4">
@@ -147,7 +239,8 @@ const Invest = () => {
                 price={livePrices[symbol]}
                 change={0}
                 tag=""
-                onInvest={(amount) => handleInvest(symbol, amount)}
+                priceHistory={chartData[symbol]}
+                onInvest={(amount) => handleTrade(symbol, amount, "BUY")}
               />
             ))}
           </div>
@@ -163,7 +256,7 @@ const Invest = () => {
                 key={symbol}
                 symbol={symbol}
                 name={symbol}
-                price={livePrices[symbol]}
+                price={livePrices[symbol] ?? 0}
                 change={0}
                 isWatched={true}
                 onToggleWatch={() => handleWatchlistToggle(symbol)}

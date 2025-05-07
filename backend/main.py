@@ -46,7 +46,7 @@ class Trade(BaseModel):
     user_id: str
     stock_name: str
     trade_type: str  # "BUY" or "SELL"
-    quantity: int
+    quantity: float
     price: float
 
 @app.post("/signup")

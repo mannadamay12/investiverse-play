@@ -1,29 +1,12 @@
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useEffect, useState } from "react";
 
 interface InvestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onInvest: (amount: number, orderType: string) => void;
+  onInvest: (amount: number) => void;
   symbol: string;
-  currentPrice: number;
+  currentPrice?: number;
+  tradeType: "BUY" | "SELL";
 }
 
 export const InvestModal = ({
@@ -32,93 +15,68 @@ export const InvestModal = ({
   onInvest,
   symbol,
   currentPrice,
+  tradeType,
 }: InvestModalProps) => {
   const [amount, setAmount] = useState("");
-  const [orderType, setOrderType] = useState("market");
-  const [shares, setShares] = useState("");
+  const [lockedPrice, setLockedPrice] = useState<number | undefined>(undefined);
 
-  const handleInvest = () => {
-    const investAmount = orderType === "amount" ? Number(amount) : Number(shares);
-    if (investAmount > 0) {
-      onInvest(investAmount, orderType);
-      onClose();
+  // Lock the currentPrice only once when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setLockedPrice(currentPrice);
+    } else {
+      setAmount("");
+      setLockedPrice(undefined);
     }
+  }, [isOpen]);
+
+  const handleConfirm = () => {
+    const value = parseFloat(amount);
+    if (!value || value <= 0 || !lockedPrice) return;
+    onInvest(value);
+    onClose();
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Invest in {symbol}</DialogTitle>
-          <DialogDescription>
-            Create your investment order for {symbol} at ${currentPrice.toFixed(2)}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div>
-            <Label>Order Type</Label>
-            <Select
-              value={orderType}
-              onValueChange={(value) => {
-                setOrderType(value);
-                setAmount("");
-                setShares("");
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select order type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="amount">Dollar Amount</SelectItem>
-                <SelectItem value="shares">Number of Shares</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+  if (!isOpen) return null;
 
-          {orderType === "amount" ? (
-            <div>
-              <Label>Amount to Invest ($)</Label>
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Enter amount"
-                min="0"
-              />
-              {amount && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Estimated shares: {(Number(amount) / currentPrice).toFixed(4)}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <Label>Number of Shares</Label>
-              <Input
-                type="number"
-                value={shares}
-                onChange={(e) => setShares(e.target.value)}
-                placeholder="Enter shares"
-                min="0"
-                step="0.0001"
-              />
-              {shares && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Total cost: ${(Number(shares) * currentPrice).toFixed(2)}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+  return (
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+      <div className="bg-white w-full max-w-md rounded-lg p-6 shadow-lg">
+        <h2 className="text-xl font-semibold mb-4">
+          {tradeType === "BUY" ? "Buy" : "Sell"} {symbol}
+        </h2>
+
+        <p className="text-sm text-gray-600 mb-2">
+          Locked Price:{" "}
+          {lockedPrice !== undefined
+            ? `$${lockedPrice.toFixed(2)}`
+            : "Loading..."}
+        </p>
+
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="Enter amount in dollars"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md"
+        />
+
+        <div className="flex justify-end gap-2 mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+          >
             Cancel
-          </Button>
-          <Button onClick={handleInvest}>
-            Invest Now
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </button>
+          <button
+            onClick={handleConfirm}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            disabled={!lockedPrice || !amount || parseFloat(amount) <= 0}
+          >
+            Confirm {tradeType}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
